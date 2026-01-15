@@ -69,9 +69,9 @@ echo "  ✓ Created $OPENCODE_COMMANDS_DIR"
 echo "  ✓ Created $LIB_DIR"
 echo
 
-# Copy library files
+# Copy library files from shared root lib directory
 echo "📚 Installing shared libraries..."
-cp -r "$REPO_ROOT/plugins/deslop-around/lib/"* "$LIB_DIR/"
+cp -r "$REPO_ROOT/lib/"* "$LIB_DIR/"
 echo "  ✓ Copied platform detection"
 echo "  ✓ Copied pattern libraries"
 echo "  ✓ Copied utility functions"
@@ -94,7 +94,9 @@ for cmd in "${COMMANDS[@]}"; do
 
   if [ -f "$SOURCE_FILE" ]; then
     # Replace Claude-specific path variables with OpenCode paths
-    sed "s|\${CLAUDE_PLUGIN_ROOT}|${OPENCODE_COMMANDS_DIR}|g" "$SOURCE_FILE" > "$TARGET_FILE"
+    # Escape sed special characters in path to prevent injection
+    SAFE_COMMANDS_DIR=$(echo "${OPENCODE_COMMANDS_DIR}" | sed 's/[&/\]/\\&/g')
+    sed "s|\${CLAUDE_PLUGIN_ROOT}|${SAFE_COMMANDS_DIR}|g" "$SOURCE_FILE" > "$TARGET_FILE"
     echo "  ✓ Installed /$cmd"
   else
     echo "  ⚠️  Skipped /$cmd (source not found)"

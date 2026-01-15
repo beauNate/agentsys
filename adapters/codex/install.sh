@@ -70,9 +70,9 @@ echo "  ✓ Created $CODEX_PROMPTS_DIR"
 echo "  ✓ Created $CODEX_LIB_DIR"
 echo
 
-# Copy library files
+# Copy library files from shared root lib directory
 echo "📚 Installing shared libraries..."
-cp -r "$REPO_ROOT/plugins/deslop-around/lib/"* "$CODEX_LIB_DIR/"
+cp -r "$REPO_ROOT/lib/"* "$CODEX_LIB_DIR/"
 echo "  ✓ Copied platform detection"
 echo "  ✓ Copied pattern libraries"
 echo "  ✓ Copied utility functions"
@@ -96,7 +96,9 @@ for cmd in "${COMMANDS[@]}"; do
 
   if [ -f "$SOURCE_FILE" ]; then
     # Replace Claude-specific path variables with Codex lib paths
-    sed "s|\${CLAUDE_PLUGIN_ROOT}|${CODEX_LIB_DIR}/..|g" "$SOURCE_FILE" > "$TARGET_FILE"
+    # Escape sed special characters in path to prevent injection
+    SAFE_LIB_DIR=$(echo "${CODEX_LIB_DIR}/.." | sed 's/[&/\]/\\&/g')
+    sed "s|\${CLAUDE_PLUGIN_ROOT}|${SAFE_LIB_DIR}|g" "$SOURCE_FILE" > "$TARGET_FILE"
     echo "  ✓ Installed /prompts:$cmd"
   else
     echo "  ⚠️  Skipped /$cmd (source not found)"
