@@ -4,6 +4,43 @@
 
 A Claude marketplace plugin providing powerful, zero-configuration slash commands for common development workflows. No setup required - commands automatically detect your project type, CI/CD platform, and deployment environment.
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/avifenesh/awsome-slash.svg)](https://github.com/avifenesh/awsome-slash/stargazers)
+
+## Quick Start
+
+### Install Locally (Available Now)
+
+```bash
+# Clone and symlink
+git clone https://github.com/avifenesh/awsome-slash.git ~/awsome-slash
+mkdir -p ~/.claude/plugins
+ln -s ~/awsome-slash ~/.claude/plugins/awesome-slash-commands
+
+# Set environment variable (add to ~/.bashrc or ~/.zshrc)
+export CLAUDE_PLUGIN_ROOT="$HOME/.claude/plugins/awesome-slash-commands"
+
+# Restart Claude Code
+```
+
+### Install from Marketplace (Coming Soon)
+
+```bash
+claude plugin install awesome-slash-commands
+```
+
+**See [INSTALLATION.md](./INSTALLATION.md) for detailed instructions.**
+
+### Prerequisites
+
+- **Git** - Required for all commands
+- **GitHub CLI (gh)** - Required for `/ship` and `/pr-merge`
+  ```bash
+  # macOS: brew install gh
+  # Windows: winget install GitHub.cli
+  # Then: gh auth login
+  ```
+
 ## Features
 
 - **Zero Configuration** - Auto-detects everything: CI platform, deployment setup, project type, package manager
