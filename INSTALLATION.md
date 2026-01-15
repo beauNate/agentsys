@@ -4,22 +4,31 @@ How to install and use awesome-slash-commands in Claude Code.
 
 ---
 
-## Option 1: Install from GitHub URL (Easiest - Available Now!)
+## Option 1: Install from GitHub (Recommended - Available Now!)
 
-Claude Code can install plugins directly from GitHub:
+Claude Code installs plugins through marketplaces. Add the repository as a marketplace, then install:
 
 ```bash
-# Install directly from GitHub
-claude plugin install https://github.com/avifenesh/awsome-slash
+# Step 1: Add the marketplace
+claude plugin marketplace add avifenesh/awsome-slash
 
-# Or using short form
-claude plugin install avifenesh/awsome-slash
+# Step 2: Install the plugin
+claude plugin install awesome-slash-commands@awsome-slash
+```
+
+**Or using full URL:**
+```bash
+# Step 1: Add marketplace with full URL
+claude plugin marketplace add https://github.com/avifenesh/awsome-slash
+
+# Step 2: Install the plugin
+claude plugin install awesome-slash-commands@awsome-slash
 ```
 
 That's it! Claude will:
-1. Download the plugin
-2. Install it to the correct location
-3. Make it available immediately
+1. Add the marketplace to your configuration
+2. Download the plugin
+3. Make commands available immediately (no restart needed)
 
 **Verify installation:**
 ```bash

@@ -6,10 +6,14 @@
 
 ## Part 1: Installation (30 seconds)
 
-### One Command Install
+### Two Command Install
 
 ```bash
-claude plugin install https://github.com/avifenesh/awsome-slash
+# Step 1: Add the marketplace
+claude plugin marketplace add avifenesh/awsome-slash
+
+# Step 2: Install the plugin
+claude plugin install awesome-slash-commands@awsome-slash
 ```
 
 **That's it!** The plugin is now installed.
@@ -475,7 +479,8 @@ No vague suggestions!
 
 ```bash
 # 1. Install (30 seconds)
-claude plugin install https://github.com/avifenesh/awsome-slash
+claude plugin marketplace add avifenesh/awsome-slash
+claude plugin install awesome-slash-commands@awsome-slash
 
 # 2. Verify (10 seconds)
 claude plugin list

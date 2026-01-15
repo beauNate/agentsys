@@ -6,10 +6,14 @@ Based on official Claude Code documentation.
 
 ## Installation
 
-### Method 1: Direct Install (Recommended)
+### Method 1: Via Terminal (Recommended)
 
 ```bash
-claude plugin install https://github.com/avifenesh/awsome-slash
+# Step 1: Add the marketplace
+claude plugin marketplace add avifenesh/awsome-slash
+
+# Step 2: Install the plugin
+claude plugin install awesome-slash-commands@awsome-slash
 ```
 
 **That's it!** Commands are immediately available. No restart needed.
@@ -18,7 +22,8 @@ claude plugin install https://github.com/avifenesh/awsome-slash
 
 While in Claude Code chat:
 ```
-/plugin install https://github.com/avifenesh/awsome-slash
+/plugin marketplace add avifenesh/awsome-slash
+/plugin install awesome-slash-commands@awsome-slash
 ```
 
 ### Verify Installation

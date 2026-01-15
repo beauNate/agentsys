@@ -2,18 +2,24 @@
 
 ## Install awesome-slash-commands in 30 seconds
 
-### Step 1: Install Plugin
+### Step 1: Add Marketplace
 
 ```bash
-claude plugin install https://github.com/avifenesh/awsome-slash
+claude plugin marketplace add avifenesh/awsome-slash
 ```
 
-**Alternative (if shorthand works):**
+**Alternative (with full URL):**
 ```bash
-claude plugin install avifenesh/awsome-slash
+claude plugin marketplace add https://github.com/avifenesh/awsome-slash
 ```
 
-### Step 2: Verify Installation
+### Step 2: Install Plugin
+
+```bash
+claude plugin install awesome-slash-commands@awsome-slash
+```
+
+### Step 3: Verify Installation
 
 ```bash
 # Check it's installed

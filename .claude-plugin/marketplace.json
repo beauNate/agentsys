@@ -1,0 +1,31 @@
+{
+  "name": "awsome-slash",
+  "description": "Professional-grade slash commands for Claude Code that work across any project",
+  "owner": {
+    "name": "Avi Fenesh",
+    "url": "https://github.com/avifenesh"
+  },
+  "plugins": [
+    {
+      "name": "awesome-slash-commands",
+      "source": ".",
+      "description": "Professional-grade slash commands for Claude Code that work across any project",
+      "version": "1.0.0",
+      "author": {
+        "name": "Avi Fenesh",
+        "url": "https://github.com/avifenesh"
+      },
+      "category": "productivity",
+      "tags": [
+        "ci-cd",
+        "deployment",
+        "code-review",
+        "automation",
+        "developer-productivity",
+        "pr-workflow",
+        "task-management",
+        "code-quality"
+      ]
+    }
+  ]
+}

@@ -9,17 +9,17 @@ A Claude marketplace plugin providing powerful, zero-configuration slash command
 
 ## Quick Start
 
-### Install from GitHub (One Command!)
+### Install from GitHub (Two Commands!)
 
 ```bash
-# Install directly from GitHub URL
-claude plugin install https://github.com/avifenesh/awsome-slash
+# Step 1: Add the marketplace
+claude plugin marketplace add avifenesh/awsome-slash
 
-# Or using the shorthand
-claude plugin install avifenesh/awsome-slash
+# Step 2: Install the plugin
+claude plugin install awesome-slash-commands@awsome-slash
 ```
 
-That's it! Restart Claude Code and start using the commands.
+That's it! Commands are available immediately - no restart needed.
 
 ### Install from Marketplace (Coming Soon)
 
