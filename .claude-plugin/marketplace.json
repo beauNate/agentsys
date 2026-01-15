@@ -12,30 +12,16 @@
     {
       "name": "next-task",
       "source": "./plugins/next-task",
-      "description": "Master workflow orchestrator with state management, specialist agents, and resume capability",
-      "version": "2.0.0",
-      "category": "productivity",
-      "features": [
-        "17-phase workflow from task to production",
-        "Policy selection via checkboxes",
-        "Resume capability (--status, --resume, --abort)",
-        "8 specialist agents (opus/sonnet)",
-        "Multi-agent code review"
-      ]
+      "description": "Master workflow orchestrator: 17-phase autonomous workflow, policy selection, resume capability, 8 specialist agents (opus/sonnet), multi-agent review",
+      "version": "2.1.0",
+      "category": "productivity"
     },
     {
       "name": "ship",
       "source": "./plugins/ship",
-      "description": "Complete PR workflow from commit to production with state integration",
+      "description": "Complete PR workflow: 12-phase commit to production, multi-agent review gates, platform-adaptive CI, automatic rollback",
       "version": "2.0.0",
-      "category": "deployment",
-      "features": [
-        "12-phase PR workflow",
-        "Multi-agent review gates",
-        "Platform-adaptive CI monitoring",
-        "Automatic rollback on failure",
-        "State management integration"
-      ]
+      "category": "deployment"
     },
     {
       "name": "deslop-around",
