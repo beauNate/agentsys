@@ -72,7 +72,10 @@ echo
 
 # Copy library files from shared root lib directory
 echo "📚 Installing shared libraries..."
-cp -r "$REPO_ROOT/lib/"* "$CODEX_LIB_DIR/"
+# Use explicit iteration to handle paths with spaces safely
+for item in "${REPO_ROOT}/lib"/*; do
+  cp -r "$item" "${CODEX_LIB_DIR}/"
+done
 echo "  ✓ Copied platform detection"
 echo "  ✓ Copied pattern libraries"
 echo "  ✓ Copied utility functions"

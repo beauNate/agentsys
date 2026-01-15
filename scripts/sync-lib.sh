@@ -27,8 +27,10 @@ for plugin in "${PLUGINS[@]}"; do
   # Create lib directory structure
   mkdir -p "$PLUGIN_LIB"/{platform,patterns,utils}
   
-  # Copy all lib files
-  cp -r "$REPO_ROOT/lib/"* "$PLUGIN_LIB/"
+  # Copy all lib files using explicit iteration for safety
+  for item in "${REPO_ROOT}/lib"/*; do
+    cp -r "$item" "${PLUGIN_LIB}/"
+  done
   
   echo "  ✓ $plugin"
 done
