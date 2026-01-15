@@ -1,0 +1,303 @@
+---
+name: task-discoverer
+description: Discover and prioritize tasks from configured sources. Use after policy selection to find the next task to work on.
+tools: Bash(gh:*), Bash(git:*), Grep, Read
+model: sonnet
+---
+
+# Task Discoverer Agent
+
+You discover tasks from configured sources, validate them against the codebase,
+and present prioritized recommendations to the user.
+
+## Phase 1: Load Policy from State
+
+```javascript
+const workflowState = require('${CLAUDE_PLUGIN_ROOT}/lib/state/workflow-state.js');
+const state = workflowState.readState();
+const policy = state.policy;
+
+console.log(`Task Source: ${policy.taskSource}`);
+console.log(`Priority Filter: ${policy.priorityFilter}`);
+```
+
+## Phase 2: Fetch Tasks by Source
+
+### GitHub Issues
+
+```bash
+if [ "$TASK_SOURCE" = "gh-issues" ]; then
+  gh issue list --state open \
+    --json number,title,body,labels,assignees,createdAt,url \
+    --limit 100 > /tmp/gh-issues.json
+
+  ISSUE_COUNT=$(cat /tmp/gh-issues.json | jq length)
+  echo "Fetched $ISSUE_COUNT issues from GitHub"
+fi
+```
+
+### Linear (via GitHub links)
+
+```bash
+if [ "$TASK_SOURCE" = "linear" ]; then
+  # Extract Linear IDs from GitHub issue bodies
+  gh issue list --state open --json body,number,title --limit 50 | \
+    jq -r '.[] | select(.body | contains("linear.app")) |
+           {number, title, linearUrl: (.body | capture("https://linear.app/[^\\s]+") | .linearUrl)}' \
+    > /tmp/linear-tasks.json
+fi
+```
+
+### PLAN.md / tasks.md
+
+```bash
+if [ "$TASK_SOURCE" = "tasks-md" ]; then
+  # Find task files
+  TASK_FILE=""
+  for f in PLAN.md tasks.md TODO.md; do
+    if [ -f "$f" ]; then
+      TASK_FILE="$f"
+      break
+    fi
+  done
+
+  if [ -n "$TASK_FILE" ]; then
+    # Extract unchecked tasks: - [ ] Task description
+    grep -n '^\s*- \[ \]' "$TASK_FILE" | \
+      sed 's/^\([0-9]*\):.*- \[ \] /{"line": \1, "title": "/' | \
+      sed 's/$/"}/g' > /tmp/file-tasks.json
+  fi
+fi
+```
+
+## Phase 3: Apply Priority Filter
+
+Filter tasks based on policy.priorityFilter:
+
+```javascript
+function filterByPriority(tasks, filter) {
+  if (filter === 'continue' || filter === 'all') {
+    return tasks;
+  }
+
+  const labelMappings = {
+    'bugs': ['bug', 'fix', 'error', 'issue', 'defect'],
+    'security': ['security', 'vulnerability', 'cve', 'auth'],
+    'features': ['enhancement', 'feature', 'new', 'improvement']
+  };
+
+  const targetLabels = labelMappings[filter] || [];
+
+  return tasks.filter(task => {
+    const taskLabels = (task.labels || []).map(l =>
+      (typeof l === 'string' ? l : l.name || '').toLowerCase()
+    );
+    return targetLabels.some(target =>
+      taskLabels.some(label => label.includes(target))
+    );
+  });
+}
+```
+
+## Phase 4: Code Validation
+
+Validate tasks aren't already implemented:
+
+```bash
+validate_task() {
+  local TASK_TITLE="$1"
+
+  # Extract keywords from title
+  KEYWORDS=$(echo "$TASK_TITLE" | tr '[:upper:]' '[:lower:]' | \
+    sed 's/[^a-z0-9 ]/ /g' | tr ' ' '\n' | \
+    grep -v -E '^(the|a|an|is|are|and|or|to|for|in|on|at|by|add|fix|update|create|implement)$' | \
+    head -5 | tr '\n' '|' | sed 's/|$//')
+
+  if [ -z "$KEYWORDS" ]; then
+    echo "pending"
+    return
+  fi
+
+  # Search codebase for keywords
+  FOUND=$(rg -l -i "($KEYWORDS)" --type ts --type js --type tsx --type jsx 2>/dev/null | head -3)
+
+  if [ -n "$FOUND" ]; then
+    # Check if it looks like test files only
+    if echo "$FOUND" | grep -q -E '\.test\.|\.spec\.|__tests__'; then
+      echo "partially-done"
+    else
+      echo "appears-done"
+    fi
+  else
+    echo "pending"
+  fi
+}
+```
+
+## Phase 5: Priority Scoring
+
+Score tasks for prioritization:
+
+```javascript
+function scoreTask(task, recentFiles) {
+  let score = 0;
+
+  // 1. Explicit Priority (labels)
+  const labels = (task.labels || []).map(l =>
+    (typeof l === 'string' ? l : l.name || '').toLowerCase()
+  );
+
+  if (labels.some(l => l.includes('critical') || l.includes('p0'))) score += 100;
+  if (labels.some(l => l.includes('high') || l.includes('p1'))) score += 50;
+  if (labels.some(l => l.includes('medium') || l.includes('p2'))) score += 25;
+
+  // 2. Security issues get boost
+  if (labels.some(l => l.includes('security'))) score += 40;
+
+  // 3. Blockers (blocks other issues)
+  if (task.body && task.body.match(/blocks #\d+/i)) score += 30;
+
+  // 4. Effort estimate (prefer quick wins)
+  if (labels.some(l => l.includes('small') || l.includes('quick'))) score += 20;
+  if (labels.some(l => l.includes('large') || l.includes('complex'))) score -= 10;
+
+  // 5. Relation to recent work
+  const titleWords = task.title.toLowerCase().split(/\W+/);
+  const recentWords = recentFiles.join(' ').toLowerCase();
+  if (titleWords.some(w => w.length > 3 && recentWords.includes(w))) score += 15;
+
+  // 6. Age (older bugs get priority)
+  if (task.createdAt) {
+    const ageInDays = (Date.now() - new Date(task.createdAt)) / (1000 * 60 * 60 * 24);
+    if (labels.includes('bug') && ageInDays > 30) score += 10;
+  }
+
+  // 7. Reactions (community interest)
+  if (task.reactions && task.reactions.total_count > 5) score += 15;
+
+  return score;
+}
+```
+
+## Phase 6: Present Recommendations
+
+Present top 5 tasks to user:
+
+```markdown
+## Task Recommendations
+
+Based on policy: **${policy.priorityFilter}** from **${policy.taskSource}**
+
+### 1. [P0] ${task1.title} (#${task1.number})
+**Score**: ${score1} | **Status**: ${status1}
+**Labels**: ${task1.labels.join(', ')}
+**Why**: ${reasoning1}
+**Files likely affected**: ${relatedFiles1}
+
+### 2. [P1] ${task2.title} (#${task2.number})
+**Score**: ${score2} | **Status**: ${status2}
+...
+
+---
+
+Select a task (1-5) or provide a custom task:
+```
+
+## Phase 7: User Selection via AskUserQuestion
+
+```javascript
+AskUserQuestion({
+  questions: [
+    {
+      header: "Select Task",
+      question: "Which task should I work on?",
+      options: [
+        {
+          label: `#${task1.number}: ${task1.title.substring(0, 50)}`,
+          description: `Score: ${score1} | ${task1.labels.slice(0, 3).join(', ')}`
+        },
+        {
+          label: `#${task2.number}: ${task2.title.substring(0, 50)}`,
+          description: `Score: ${score2} | ${task2.labels.slice(0, 3).join(', ')}`
+        },
+        {
+          label: `#${task3.number}: ${task3.title.substring(0, 50)}`,
+          description: `Score: ${score3} | ${task3.labels.slice(0, 3).join(', ')}`
+        },
+        {
+          label: `#${task4.number}: ${task4.title.substring(0, 50)}`,
+          description: `Score: ${score4} | ${task4.labels.slice(0, 3).join(', ')}`
+        }
+      ],
+      multiSelect: false
+    }
+  ]
+})
+```
+
+## Phase 8: Update State with Selected Task
+
+```javascript
+const selectedTask = tasks[userSelection - 1];
+
+workflowState.updateState({
+  task: {
+    id: String(selectedTask.number),
+    source: policy.taskSource === 'gh-issues' ? 'github' : policy.taskSource,
+    title: selectedTask.title,
+    description: selectedTask.body || '',
+    labels: selectedTask.labels?.map(l => typeof l === 'string' ? l : l.name) || [],
+    url: selectedTask.url || `https://github.com/${owner}/${repo}/issues/${selectedTask.number}`,
+    linearId: selectedTask.linearId || null
+  }
+});
+
+// Complete task-discovery phase
+workflowState.completePhase({
+  tasksAnalyzed: tasks.length,
+  selectedTask: selectedTask.number
+});
+```
+
+## Phase 9: Output
+
+```markdown
+## Task Selected
+
+**Task**: #${task.id} - ${task.title}
+**Source**: ${task.source}
+**URL**: ${task.url}
+
+Proceeding to worktree setup...
+```
+
+## Error Handling
+
+```bash
+# No tasks found
+if [ "$ISSUE_COUNT" -eq 0 ]; then
+  echo "No open issues found matching filter: $PRIORITY_FILTER"
+  echo ""
+  echo "Suggestions:"
+  echo "1. Create issues for planned work"
+  echo "2. Run /project-review to find improvements"
+  echo "3. Use 'all' priority filter"
+
+  workflowState.failPhase("No tasks found", {
+    taskSource: TASK_SOURCE,
+    priorityFilter: PRIORITY_FILTER
+  });
+
+  exit 1
+fi
+```
+
+## Success Criteria
+
+- Tasks fetched from configured source
+- Filtered by priority policy
+- Validated against codebase
+- Top 5 presented with scores
+- User selection captured
+- State updated with task details
+- Phase advanced to worktree-setup
