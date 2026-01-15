@@ -10,9 +10,8 @@ echo
 # Configuration
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CODEX_CONFIG_DIR="${HOME}/.codex"
-CODEX_PROMPTS_DIR="${CODEX_CONFIG_DIR}/prompts/awsome-slash"
-COMMANDS_DIR="${CODEX_PROMPTS_DIR}/commands"
-LIB_DIR="${CODEX_PROMPTS_DIR}/lib"
+CODEX_PROMPTS_DIR="${CODEX_CONFIG_DIR}/prompts"
+CODEX_LIB_DIR="${CODEX_CONFIG_DIR}/awsome-slash/lib"
 
 # Detect OS and normalize paths
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
@@ -21,16 +20,16 @@ if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
   CODEX_CONFIG_DIR="${USERPROFILE}/.codex"
   # Replace backslashes with forward slashes
   CODEX_CONFIG_DIR="${CODEX_CONFIG_DIR//\\//}"
-  CODEX_PROMPTS_DIR="${CODEX_CONFIG_DIR}/prompts/awsome-slash"
-  COMMANDS_DIR="${CODEX_PROMPTS_DIR}/commands"
-  LIB_DIR="${CODEX_PROMPTS_DIR}/lib"
+  CODEX_PROMPTS_DIR="${CODEX_CONFIG_DIR}/prompts"
+  CODEX_LIB_DIR="${CODEX_CONFIG_DIR}/awsome-slash/lib"
 else
   IS_WINDOWS=false
 fi
 
 echo "📂 Configuration:"
 echo "  Repository: $REPO_ROOT"
-echo "  Install to: $CODEX_PROMPTS_DIR"
+echo "  Prompts to: $CODEX_PROMPTS_DIR"
+echo "  Libraries to: $CODEX_LIB_DIR"
 echo
 
 # Check prerequisites
@@ -65,15 +64,15 @@ echo
 
 # Create directories
 echo "📁 Creating directories..."
-mkdir -p "$COMMANDS_DIR"
-mkdir -p "$LIB_DIR"/{platform,patterns,utils}
-echo "  ✓ Created $COMMANDS_DIR"
-echo "  ✓ Created $LIB_DIR"
+mkdir -p "$CODEX_PROMPTS_DIR"
+mkdir -p "$CODEX_LIB_DIR"/{platform,patterns,utils}
+echo "  ✓ Created $CODEX_PROMPTS_DIR"
+echo "  ✓ Created $CODEX_LIB_DIR"
 echo
 
 # Copy library files
 echo "📚 Installing shared libraries..."
-cp -r "$REPO_ROOT/plugins/deslop-around/lib/"* "$LIB_DIR/"
+cp -r "$REPO_ROOT/plugins/deslop-around/lib/"* "$CODEX_LIB_DIR/"
 echo "  ✓ Copied platform detection"
 echo "  ✓ Copied pattern libraries"
 echo "  ✓ Copied utility functions"
@@ -92,12 +91,13 @@ COMMANDS=(
 
 for cmd in "${COMMANDS[@]}"; do
   SOURCE_FILE="$REPO_ROOT/plugins/$cmd/commands/$cmd.md"
-  TARGET_FILE="$COMMANDS_DIR/$cmd.md"
+  # Install directly in prompts directory (Codex looks here)
+  TARGET_FILE="$CODEX_PROMPTS_DIR/$cmd.md"
 
   if [ -f "$SOURCE_FILE" ]; then
-    # Replace Claude-specific path variables with Codex paths
-    sed "s|\${CLAUDE_PLUGIN_ROOT}|${CODEX_PROMPTS_DIR}|g" "$SOURCE_FILE" > "$TARGET_FILE"
-    echo "  ✓ Installed /$cmd"
+    # Replace Claude-specific path variables with Codex lib paths
+    sed "s|\${CLAUDE_PLUGIN_ROOT}|${CODEX_LIB_DIR}/..|g" "$SOURCE_FILE" > "$TARGET_FILE"
+    echo "  ✓ Installed /prompts:$cmd"
   else
     echo "  ⚠️  Skipped /$cmd (source not found)"
   fi
@@ -105,63 +105,39 @@ done
 
 echo
 
-# Create environment setup script
-echo "📝 Creating environment setup..."
-cat > "$CODEX_PROMPTS_DIR/env.sh" << 'EOF'
-#!/usr/bin/env bash
-# Environment variables for awsome-slash commands in Codex CLI
-
-# Set the root directory for commands to find libraries
-export CODEX_PROMPTS_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-# Add lib directory to NODE_PATH if needed
-export NODE_PATH="${CODEX_PROMPTS_ROOT}/lib:${NODE_PATH}"
-
-# Platform detection helpers
-export AWSOME_SLASH_PLATFORM_SCRIPT="${CODEX_PROMPTS_ROOT}/lib/platform/detect-platform.js"
-export AWSOME_SLASH_TOOLS_SCRIPT="${CODEX_PROMPTS_ROOT}/lib/platform/verify-tools.js"
-EOF
-
-chmod +x "$CODEX_PROMPTS_DIR/env.sh"
-echo "  ✓ Created environment setup script"
-echo
-
 # Create README
-cat > "$CODEX_PROMPTS_DIR/README.md" << 'EOF'
+cat > "$CODEX_CONFIG_DIR/AWSOME_SLASH_README.md" << 'EOF'
 # awsome-slash for Codex CLI
 
-This directory contains the awsome-slash commands adapted for OpenAI Codex CLI.
+Commands installed for OpenAI Codex CLI.
 
 ## Available Commands
 
-- `/deslop-around` - AI slop cleanup with minimal diffs
-- `/next-task` - Intelligent task prioritization
-- `/project-review` - Multi-agent code review
-- `/ship` - Complete PR workflow
-- `/pr-merge` - Intelligent PR merge
+Access via /prompts: menu:
+- `/prompts:deslop-around` - AI slop cleanup
+- `/prompts:next-task` - Task prioritization
+- `/prompts:project-review` - Code review
+- `/prompts:ship` - PR workflow
+- `/prompts:pr-merge` - PR merge
 
 ## Usage
 
-In Codex CLI, invoke commands directly:
-
+In Codex CLI:
 ```bash
-/deslop-around
-/next-task
-/project-review
-/ship
-/pr-merge
+codex
+> /prompts:deslop-around
+> /prompts:next-task bug
+> /prompts:ship --strategy rebase
 ```
 
-## Environment
+Or type `/prompts:` to see the menu.
 
-Commands use the shared library at:
-```
-~/.codex/prompts/awsome-slash/lib/
-```
+## Libraries
+
+Shared libraries at: ~/.codex/awsome-slash/lib/
 
 ## Updates
 
-To update commands, re-run the installer:
 ```bash
 cd /path/to/awsome-slash
 ./adapters/codex/install.sh
@@ -179,15 +155,18 @@ echo
 # Success message
 echo "✅ Installation complete!"
 echo
-echo "📋 Installed Commands:"
+echo "📋 Installed Commands (access via /prompts: menu):"
 for cmd in "${COMMANDS[@]}"; do
-  echo "  • /$cmd"
+  echo "  • /prompts:$cmd"
 done
 echo
 echo "📖 Next Steps:"
 echo "  1. Start Codex CLI: codex"
-echo "  2. Use commands: /$cmd"
-echo "  3. See help: cat $CODEX_PROMPTS_DIR/README.md"
+echo "  2. Type: /prompts: (shows menu)"
+echo "  3. Select a command or type: /prompts:deslop-around"
+echo "  4. See help: cat $CODEX_CONFIG_DIR/AWSOME_SLASH_README.md"
+echo
+echo "💡 Pro Tip: Type /prompts: to see all available prompts"
 echo
 echo "🔄 To update commands, re-run this installer:"
 echo "  ./adapters/codex/install.sh"
