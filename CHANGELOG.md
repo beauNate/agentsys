@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] - 2026-01-16
+
+### Fixed
+- **Codex CLI Install Script**: Now uses `codex mcp add` command for proper MCP server registration
+- **Codex Skills**: Creates skills in proper `<skill-name>/SKILL.md` folder structure per Codex docs
+- **OpenCode Install Script**: Uses `opencode.json` config with proper `mcp` object format
+- **OpenCode Agents**: Creates agents with proper markdown frontmatter (description, mode, tools)
+
 ## [2.1.1] - 2026-01-16
 
 ### Fixed
