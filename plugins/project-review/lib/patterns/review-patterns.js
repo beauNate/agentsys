@@ -333,25 +333,25 @@ const _flattenedPatterns = new Map();
   for (const [framework, categories] of Object.entries(reviewPatterns)) {
     let totalPatterns = 0;
     const flattened = [];
-    
+
     for (const [category, patterns] of Object.entries(categories)) {
       _categoriesSet.add(category);
-      
+
       // Index by category
       if (!_patternsByCategory.has(category)) {
         _patternsByCategory.set(category, new Map());
       }
       _patternsByCategory.get(category).set(framework, patterns);
-      
+
       // Count patterns
       totalPatterns += patterns.length;
-      
+
       // Flatten for search
       for (const pattern of patterns) {
         flattened.push({ category, pattern });
       }
     }
-    
+
     _patternCountByFramework.set(framework, totalPatterns);
     _flattenedPatterns.set(framework, flattened);
   }
@@ -467,7 +467,7 @@ function getTotalPatternCount() {
 function searchPatterns(keyword) {
   const lowerKeyword = keyword.toLowerCase();
   const results = [];
-  
+
   for (const [framework, patterns] of _flattenedPatterns) {
     for (const { category, pattern } of patterns) {
       if (pattern.toLowerCase().includes(lowerKeyword)) {
@@ -475,7 +475,7 @@ function searchPatterns(keyword) {
       }
     }
   }
-  
+
   return results;
 }
 

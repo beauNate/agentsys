@@ -80,7 +80,7 @@ describe('verify-tools', () => {
       spawn.mockReturnValue(mockChild);
 
       const promise = checkToolAsync('node');
-      
+
       // Simulate stdout data
       mockChild.stdout.emit('data', Buffer.from('v20.0.0\n'));
       // Simulate successful close
@@ -99,7 +99,7 @@ describe('verify-tools', () => {
       spawn.mockReturnValue(mockChild);
 
       const promise = checkToolAsync('nonexistent');
-      
+
       // Simulate error
       mockChild.emit('error', new Error('spawn ENOENT'));
 
@@ -163,7 +163,7 @@ describe('verify-tools', () => {
       }
 
       const result = verifyTools();
-      
+
       TOOL_DEFINITIONS.forEach(tool => {
         expect(result).toHaveProperty(tool.name);
         expect(result[tool.name]).toHaveProperty('available');
@@ -182,18 +182,18 @@ describe('verify-tools', () => {
         const child = new EventEmitter();
         child.stdout = new EventEmitter();
         child.kill = jest.fn();
-        
+
         // Simulate immediate close
         setImmediate(() => {
           child.stdout.emit('data', Buffer.from('v1.0.0'));
           child.emit('close', 0);
         });
-        
+
         return child;
       });
 
       const result = await verifyToolsAsync();
-      
+
       TOOL_DEFINITIONS.forEach(tool => {
         expect(result).toHaveProperty(tool.name);
       });

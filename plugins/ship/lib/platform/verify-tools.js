@@ -31,10 +31,10 @@ function checkTool(command, versionFlag = '--version') {
   if (!/^[a-zA-Z0-9_-]+$/.test(versionFlag)) {
     return { available: false, version: null };
   }
-  
+
   try {
     let output;
-    
+
     if (isWindows) {
       // On Windows, use spawnSync with shell to handle .cmd/.bat scripts
       // Input is validated above so this is safe
@@ -85,7 +85,7 @@ function checkToolAsync(command, versionFlag = '--version') {
     }
 
     let child;
-    
+
     if (isWindows) {
       // On Windows, spawn shell directly with command as single argument to avoid deprecation warning
       // Input is validated above so this is safe
@@ -99,9 +99,9 @@ function checkToolAsync(command, versionFlag = '--version') {
         stdio: ['pipe', 'pipe', 'ignore']
       });
     }
-    
+
     let stdout = '';
-    
+
     // Set timeout
     const timeout = setTimeout(() => {
       child.kill();
@@ -135,44 +135,44 @@ const TOOL_DEFINITIONS = [
   // Version control
   { name: 'git', flag: '--version' },
   { name: 'gh', flag: '--version' },
-  
+
   // Node.js ecosystem
   { name: 'node', flag: '--version' },
   { name: 'npm', flag: '--version' },
   { name: 'pnpm', flag: '--version' },
   { name: 'yarn', flag: '--version' },
   { name: 'bun', flag: '--version' },
-  
+
   // Python ecosystem
   { name: 'python', flag: '--version' },
   { name: 'python3', flag: '--version' },
   { name: 'pip', flag: '--version' },
   { name: 'pip3', flag: '--version' },
   { name: 'poetry', flag: '--version' },
-  
+
   // Rust ecosystem
   { name: 'cargo', flag: '--version' },
   { name: 'rustc', flag: '--version' },
   { name: 'rustup', flag: '--version' },
-  
+
   // Go ecosystem
   { name: 'go', flag: 'version' },
-  
+
   // Java ecosystem
   { name: 'java', flag: '--version' },
   { name: 'javac', flag: '--version' },
   { name: 'mvn', flag: '--version' },
   { name: 'gradle', flag: '--version' },
-  
+
   // Containerization
   { name: 'docker', flag: '--version' },
-  
+
   // Deployment platforms
   { name: 'railway', flag: '--version' },
   { name: 'vercel', flag: '--version' },
   { name: 'netlify', flag: '--version' },
   { name: 'flyctl', flag: 'version' },
-  
+
   // CI/CD tools
   { name: 'circleci', flag: 'version' }
 ];
@@ -199,13 +199,13 @@ async function verifyToolsAsync() {
   const results = await Promise.all(
     TOOL_DEFINITIONS.map(tool => checkToolAsync(tool.name, tool.flag))
   );
-  
+
   // Build result object
   const toolMap = {};
   TOOL_DEFINITIONS.forEach((tool, index) => {
     toolMap[tool.name] = results[index];
   });
-  
+
   return toolMap;
 }
 

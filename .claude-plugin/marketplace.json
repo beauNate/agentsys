@@ -1,7 +1,7 @@
 {
   "name": "awsome-slash",
   "description": "Professional-grade slash commands for Claude Code with cross-platform support (OpenCode, Codex CLI)",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "owner": {
     "name": "Avi Fenesh",
     "url": "https://github.com/avifenesh"
@@ -12,7 +12,7 @@
     {
       "name": "next-task",
       "source": "./plugins/next-task",
-      "description": "Master workflow orchestrator: 17-phase autonomous workflow, policy selection, resume capability, 8 specialist agents (opus/sonnet), multi-agent review",
+      "description": "Master workflow orchestrator: 13-phase autonomous workflow, policy selection, resume capability, 12 specialist agents (opus/sonnet), multi-agent review",
       "version": "2.1.0",
       "category": "productivity"
     },

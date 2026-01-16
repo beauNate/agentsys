@@ -126,7 +126,7 @@ describe('slop-patterns', () => {
         language: 'javascript',
         severity: 'high'
       });
-      
+
       Object.values(patterns).forEach(pattern => {
         expect(pattern.severity).toBe('high');
         expect([null, 'javascript']).toContain(pattern.language);

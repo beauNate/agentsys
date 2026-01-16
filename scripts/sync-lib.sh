@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Sync shared lib/ to all plugins
-# 
+#
 # DEVELOPER TOOL: Run this after modifying files in lib/ to propagate
 # changes to all plugins. Then commit the updated plugin lib/ files.
 #
@@ -16,22 +16,21 @@ echo "Syncing lib/ to all plugins..."
 PLUGINS=(
   "deslop-around"
   "next-task"
-  "pr-merge"
   "project-review"
   "ship"
 )
 
 for plugin in "${PLUGINS[@]}"; do
   PLUGIN_LIB="$REPO_ROOT/plugins/$plugin/lib"
-  
+
   # Create lib directory structure
   mkdir -p "$PLUGIN_LIB"/{platform,patterns,utils}
-  
+
   # Copy all lib files using explicit iteration for safety
   for item in "${REPO_ROOT}/lib"/*; do
     cp -r "$item" "${PLUGIN_LIB}/"
   done
-  
+
   echo "  ✓ $plugin"
 done
 

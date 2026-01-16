@@ -204,7 +204,7 @@ describe('detect-platform', () => {
 
       const result1 = detect();
       expect(result1.projectType).toBe('unknown');
-      
+
       // Change the mock and force refresh
       fs.existsSync.mockImplementation((path) => path === 'Cargo.toml');
       invalidateCache(); // Clear internal file cache too
@@ -228,10 +228,10 @@ describe('detect-platform', () => {
 
       detect();
       invalidateCache();
-      
+
       // Change the mock
       fs.existsSync.mockImplementation((path) => path === 'go.mod');
-      
+
       const result = detect();
       expect(result.projectType).toBe('go');
     });

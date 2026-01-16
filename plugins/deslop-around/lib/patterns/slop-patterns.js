@@ -476,7 +476,7 @@ const _availableSeverities = new Set();
     }
     _patternsByLanguage.get(lang)[name] = pattern;
     _availableLanguages.add(lang);
-    
+
     // Index by severity
     const severity = pattern.severity;
     if (!_patternsBySeverity.has(severity)) {
@@ -484,7 +484,7 @@ const _availableSeverities = new Set();
     }
     _patternsBySeverity.get(severity)[name] = pattern;
     _availableSeverities.add(severity);
-    
+
     // Index by autoFix strategy
     const autoFix = pattern.autoFix || 'none';
     if (!_patternsByAutoFix.has(autoFix)) {
@@ -507,7 +507,7 @@ Object.freeze(_availableSeverities);
 function getPatternsForLanguage(language) {
   const langPatterns = _patternsByLanguage.get(language) || {};
   const universalPatterns = _patternsByLanguage.get('universal') || {};
-  
+
   // Merge language-specific with universal patterns
   return { ...universalPatterns, ...langPatterns };
 }
@@ -557,28 +557,28 @@ function getPatternsByAutoFix(autoFix) {
  */
 function getPatternsByCriteria(criteria = {}) {
   let result = { ...slopPatterns };
-  
+
   if (criteria.language) {
     const langPatterns = getPatternsForLanguage(criteria.language);
     result = Object.fromEntries(
       Object.entries(result).filter(([name]) => name in langPatterns)
     );
   }
-  
+
   if (criteria.severity) {
     const severityPatterns = getPatternsBySeverity(criteria.severity);
     result = Object.fromEntries(
       Object.entries(result).filter(([name]) => name in severityPatterns)
     );
   }
-  
+
   if (criteria.autoFix) {
     const autoFixPatterns = getPatternsByAutoFix(criteria.autoFix);
     result = Object.fromEntries(
       Object.entries(result).filter(([name]) => name in autoFixPatterns)
     );
   }
-  
+
   return result;
 }
 

@@ -122,7 +122,7 @@ async function detectCIAsync() {
     existsCachedAsync('Jenkinsfile'),
     existsCachedAsync('.travis.yml')
   ]);
-  
+
   if (checks[0]) return 'github-actions';
   if (checks[1]) return 'gitlab-ci';
   if (checks[2]) return 'circleci';
@@ -160,7 +160,7 @@ async function detectDeploymentAsync() {
     existsCachedAsync('.platform.sh'),
     existsCachedAsync('render.yaml')
   ]);
-  
+
   if (checks[0] || checks[1]) return 'railway';
   if (checks[2]) return 'vercel';
   if (checks[3] || checks[4]) return 'netlify';
@@ -198,7 +198,7 @@ async function detectProjectTypeAsync() {
     existsCachedAsync('pom.xml'),
     existsCachedAsync('build.gradle')
   ]);
-  
+
   if (checks[0]) return 'nodejs';
   if (checks[1] || checks[2] || checks[3]) return 'python';
   if (checks[4]) return 'rust';
@@ -238,7 +238,7 @@ async function detectPackageManagerAsync() {
     existsCachedAsync('Cargo.lock'),
     existsCachedAsync('go.sum')
   ]);
-  
+
   if (checks[0]) return 'pnpm';
   if (checks[1]) return 'yarn';
   if (checks[2]) return 'bun';
@@ -279,9 +279,9 @@ function detectBranchStrategy() {
         if (content) {
           const config = JSON.parse(content);
           // Validate JSON structure before accessing properties
-          if (config && 
+          if (config &&
               typeof config === 'object' &&
-              typeof config.environments === 'object' && 
+              typeof config.environments === 'object' &&
               config.environments !== null &&
               Object.keys(config.environments).length > 1) {
             return 'multi-branch';
@@ -323,9 +323,9 @@ async function detectBranchStrategyAsync() {
         const content = await readFileCachedAsync('railway.json');
         if (content) {
           const config = JSON.parse(content);
-          if (config && 
+          if (config &&
               typeof config === 'object' &&
-              typeof config.environments === 'object' && 
+              typeof config.environments === 'object' &&
               config.environments !== null &&
               Object.keys(config.environments).length > 1) {
             return 'multi-branch';
@@ -394,12 +394,12 @@ async function detectMainBranchAsync() {
  */
 function detect(forceRefresh = false) {
   const now = Date.now();
-  
+
   // Return cached result if still valid
   if (!forceRefresh && _cachedDetection && now < _cacheExpiry) {
     return _cachedDetection;
   }
-  
+
   _cachedDetection = {
     ci: detectCI(),
     deployment: detectDeployment(),
@@ -412,7 +412,7 @@ function detect(forceRefresh = false) {
     timestamp: new Date(now).toISOString()
   };
   _cacheExpiry = now + CACHE_TTL_MS;
-  
+
   return _cachedDetection;
 }
 
@@ -424,12 +424,12 @@ function detect(forceRefresh = false) {
  */
 async function detectAsync(forceRefresh = false) {
   const now = Date.now();
-  
+
   // Return cached result if still valid
   if (!forceRefresh && _cachedDetection && now < _cacheExpiry) {
     return _cachedDetection;
   }
-  
+
   // Run all detections in parallel
   const [
     ci,
@@ -450,7 +450,7 @@ async function detectAsync(forceRefresh = false) {
     existsCachedAsync('PLAN.md'),
     existsCachedAsync('TECHNICAL_DEBT.md')
   ]);
-  
+
   _cachedDetection = {
     ci,
     deployment,
@@ -463,7 +463,7 @@ async function detectAsync(forceRefresh = false) {
     timestamp: new Date(now).toISOString()
   };
   _cacheExpiry = now + CACHE_TTL_MS;
-  
+
   return _cachedDetection;
 }
 
