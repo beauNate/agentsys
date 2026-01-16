@@ -7,16 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-01-16
+
 ### Added
-- **Comprehensive Command Injection Tests**: 44 new test cases for `verify-tools.js` security validation (#61)
+- **CI & Review Monitor Loop** for `/ship` command (#79)
+  - Continuous monitoring loop waits for CI AND addresses ALL PR feedback
+  - Auto-waits 3 minutes on first iteration for review bots (Gemini, CodeRabbit)
+  - Configurable via `SHIP_INITIAL_WAIT` environment variable
+  - Addresses every comment: fixes, answers questions, or explains resolution
+  - GraphQL-based thread resolution and reply functionality
+- **Comprehensive Command Injection Tests**: 44 new test cases for `verify-tools.js` (#61, #78)
   - Newline injection patterns (LF, CR, CRLF)
   - Null byte injection
   - Path traversal (Unix and Windows)
   - Command substitution (backticks, dollar-paren)
   - Quote escaping (single and double quotes)
   - Shell metacharacters (pipes, redirects, operators, globs)
-  - Tests validate both command name and version flag parameters
 
+### Changed
+- **Progressive Disclosure Refactoring** for reduced context consumption
+  - `ship.md`: 1697 → 337 lines (-80%), split into 4 files
+  - `project-review.md`: 929 → 273 lines (-71%), split into 3 files
+  - All core command files now under 500 line limit per Claude Code best practices
+  - Reference files loaded on-demand, reducing base context consumption
+- **Explicit Workflow State Updates** in next-task agents
+  - Mandatory state updates box diagrams in all agents
+  - Clear `recordStepCompletion()` function template
+  - Explicit /ship invocation requirement after docs-updater
+  - Worktree cleanup responsibilities matrix
+  - "Existing session" vs "stale session" semantics clarified
+
+### Fixed
+- **Security**: Protected `deepMerge` against prototype pollution attacks
+- **Security**: Improved input validation in core libraries
+- **Performance**: Optimized core library operations
 
 ## [2.2.1] - 2026-01-16
 
