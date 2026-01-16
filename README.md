@@ -5,19 +5,15 @@
 A cross-platform plugin providing powerful, zero-configuration slash commands for development workflows. Works with **Claude Code**, **Codex CLI**, and **OpenCode**.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.2.0-blue)](https://github.com/avifenesh/awsome-slash/releases)
+[![Version](https://img.shields.io/badge/version-2.2.1-blue)](https://github.com/avifenesh/awsome-slash/releases)
 [![GitHub stars](https://img.shields.io/github/stars/avifenesh/awsome-slash?style=flat&color=yellow)](https://github.com/avifenesh/awsome-slash/stargazers)
 [![Claude Code](https://img.shields.io/badge/Claude-Code%20Plugin-blue)](https://code.claude.com/)
 [![Codex CLI](https://img.shields.io/badge/Codex-CLI%20Compatible-green)](https://developers.openai.com/codex/cli)
 [![OpenCode](https://img.shields.io/badge/OpenCode-Compatible-orange)](https://opencode.ai)
 
-## What's New in v2.2.0
+## What's New in v2.2.1
 
-- **Two-File State Management** - Prevents workflow collisions with `tasks.json` (main repo) + `workflow-status.json` (worktree)
-- **Model Optimization** - Cost-efficient stratification: opus (complex), sonnet (moderate), haiku (simple)
-- **Workflow Enforcement Gates** - Explicit STOP gates prevent agents from skipping mandatory phases
-- **Enhanced Test Coverage** - Validates tests actually exercise new code, not just path matching
-- **New Agents** - `ci-fixer` (sonnet) and `simple-fixer` (haiku) for delegation pattern
+- **Version Sync Fix** - All package manifests now correctly report version 2.2.1
 - **Resume by ID/Branch/Path** - `/next-task --resume 123` or `--resume feature/my-task`
 - **14 Specialist Agents** - Optimized with sonnet→haiku delegation pattern
 
