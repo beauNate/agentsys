@@ -1,9 +1,23 @@
 {
-  "name": "awesome-slash-commands",
-  "version": "2.3.1",
+  "name": "awsome-slash",
+  "version": "2.4.1",
   "description": "Professional-grade slash commands for Claude Code that work across any project",
   "main": "lib/platform/detect-platform.js",
   "type": "commonjs",
+  "files": [
+    ".claude-plugin/",
+    ".mcp.json",
+    "lib/",
+    "mcp-server/index.js",
+    "mcp-server/package.json",
+    "plugins/",
+    "scripts/install/",
+    "adapters/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "SECURITY.md"
+  ],
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
@@ -13,21 +27,26 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/avifenesh/awsome-slash.git"
+    "url": "git+https://github.com/avifenesh/awsome-slash.git"
   },
   "keywords": [
     "claude",
     "claude-code",
+    "claude-plugin",
+    "anthropic",
     "slash-commands",
+    "ai-coding",
+    "workflow-automation",
     "ci-cd",
     "deployment",
     "code-review",
-    "automation",
-    "developer-tools"
+    "mcp",
+    "developer-tools",
+    "opencode",
+    "codex-cli"
   ],
   "author": {
     "name": "Avi Fenesh",
-    "email": "",
     "url": "https://github.com/avifenesh"
   },
   "license": "MIT",
@@ -40,6 +59,5 @@
   },
   "devDependencies": {
     "jest": "^29.7.0"
-  },
-  "dependencies": {}
+  }
 }

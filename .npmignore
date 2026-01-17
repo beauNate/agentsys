@@ -1,0 +1,48 @@
+# Tests
+__tests__/
+*.test.js
+*.spec.js
+jest.config.js
+coverage/
+
+# Development
+.git/
+.github/
+.vscode/
+.idea/
+
+# Local state files
+settings.local.json
+tasks.json
+workflow-state.json
+*.local.md
+.claude/
+
+# Build artifacts
+node_modules/
+**/node_modules/
+mcp-server/node_modules/
+*.log
+npm-debug.log*
+.npm/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation (keep essential only)
+ADAPTER_DESIGN.md
+COMPLETE_GUIDE.md
+CONTRIBUTING.md
+HOW_TO_USE.md
+INSTALLATION.md
+MANUAL_TESTING.md
+QUICK_INSTALL.md
+QUICKSTART.md
+USAGE_EXAMPLES.md
+docs/
+
+# Misc
+*.tgz
+.env*
+.npmrc
