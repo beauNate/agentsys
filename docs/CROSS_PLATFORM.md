@@ -40,7 +40,7 @@ claude --add-plugin /path/to/awesome-slash/plugins/ship
 
 **Core Workflow (Opus):**
 - `exploration-agent` - Deep codebase analysis (tools: Read, Grep, Glob, LSP, Task)
-- `planning-agent` - Design implementation plans (tools: Read, Grep, EnterPlanMode, Task)
+- `planning-agent` - Design implementation plans (tools: Read, Grep, Glob, Bash(git:*), Task)
 - `implementation-agent` - Execute plans with quality code (tools: Read, Write, Edit, Bash, Task)
 - `review-orchestrator` - Multi-agent code review with iteration (tools: Task)
 

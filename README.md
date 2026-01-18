@@ -6,18 +6,18 @@ A cross-platform plugin providing powerful, zero-configuration slash commands fo
 
 [![npm](https://img.shields.io/npm/v/awesome-slash?color=red)](https://www.npmjs.com/package/awesome-slash)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.4.5-blue)](https://github.com/avifenesh/awesome-slash/releases)
+[![Version](https://img.shields.io/badge/version-2.4.6-blue)](https://github.com/avifenesh/awesome-slash/releases)
 [![GitHub stars](https://img.shields.io/github/stars/avifenesh/awesome-slash?style=flat&color=yellow)](https://github.com/avifenesh/awesome-slash/stargazers)
 [![Claude Code](https://img.shields.io/badge/Claude-Code%20Plugin-blue)](https://docs.anthropic.com/en/docs/claude-code)
 [![Codex CLI](https://img.shields.io/badge/Codex-CLI%20Compatible-green)](https://developers.openai.com/codex/cli)
 [![OpenCode](https://img.shields.io/badge/OpenCode-Compatible-orange)](https://opencode.ai)
 
-## What's New in v2.4.5
+## What's New in v2.4.6
 
-- **Agent Tool Enforcement** - Fixed critical issues with checkbox agents and plan mode
-- **Schema Validator** - Fixed validation bugs for strings, arrays, and null handling
-- **Cache Management** - Migrated to CacheManager abstraction with size limits and TTL
-- **Documentation** - Simplified and clarified user-facing documentation
+- **Documentation Accuracy** - Fixed all config file names, phase counts, and time estimates
+- **Auto-Resume Prevention** - Added mandatory gates to prevent automatic task resumption
+- **Planning Flow** - Improved architecture with JSON output and orchestrator control
+- **Work Guidelines** - Added "No Summary Files" policy to CLAUDE.md
 
 ---
 

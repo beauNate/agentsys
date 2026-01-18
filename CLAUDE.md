@@ -50,7 +50,7 @@ The main orchestrator **MUST spawn these agents in order**:
 | 2 | `task-discoverer` | sonnet | Bash(gh:*), Read | Find and prioritize tasks |
 | 3 | `worktree-manager` | haiku | Bash(git:*) | Create isolated worktree |
 | 4 | `exploration-agent` | opus | Read, Grep, Glob, LSP, Task | Deep codebase analysis |
-| 5 | `planning-agent` | opus | Read, Grep, EnterPlanMode, Task | Design implementation plan |
+| 5 | `planning-agent` | opus | Read, Grep, Glob, Bash(git:*), Task | Design implementation plan |
 | 6 | **USER APPROVAL** | - | - | Last human touchpoint |
 | 7 | `implementation-agent` | opus | Read, Write, Edit, Bash | Execute plan |
 | 8 | `deslop-work` | sonnet | Read, Grep, Task(simple-fixer) | Clean AI slop |
@@ -128,6 +128,34 @@ The ship command **MUST execute these phases**:
 - Maintain **80%+ test coverage**
 - Run `npm test` before commits
 - Update CHANGELOG.md with every PR
+
+---
+
+## Work Guidelines
+
+### No Summary Files
+
+**CRITICAL**: Do NOT create summary, audit, or completion files unless explicitly part of the documented workflow.
+
+**Prohibited files**:
+- `*_FIXES_APPLIED.md`
+- `*_AUDIT.md`
+- `*_SUMMARY.md`
+- `*_COMPLETION.md`
+- Any other summary/report files
+
+**Why**:
+- Summary files clutter the repository
+- Information should be in CHANGELOG.md or commit messages
+- User doesn't want post-task summaries
+- Focus on the work, not documentation about the work
+
+**When summary files ARE allowed**:
+- Explicitly requested by user
+- Part of documented workflow (e.g., CHANGELOG.md)
+- Required by process (e.g., PLAN.md in plan mode)
+
+**If you complete a task**: Report completion verbally, update CHANGELOG.md if appropriate, but do NOT create a summary file.
 
 ---
 

@@ -9,6 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 No unreleased changes documented.
 
+## [2.4.6] - 2026-01-18
+
+### Fixed
+- **Documentation Accuracy** - Fixed all documentation inconsistencies (#91)
+  - Fixed config file name: `.claude.config.json` → `.awesomeslashrc.json` in INSTALLATION.md
+  - Fixed phase counts: Updated to 18 phases in USAGE.md, CROSS_PLATFORM.md
+  - Removed all time estimates from user-facing docs (policy compliance)
+  - Updated planning-agent tools in CLAUDE.md and CROSS_PLATFORM.md
+  - Fixed non-existent script references in migration guides
+- **Auto-Resume Prevention** - Added mandatory gates to prevent automatic task resumption (#92)
+  - Added ⛔ NO AUTO-RESUME gate in next-task.md
+  - Added mandatory existing task check in policy-selector.md (Phase 1.5)
+  - User must explicitly choose: start new, resume, abort, or view status
+  - Warning for active tasks (< 1 hour old) that may be running elsewhere
+  - Default behavior: "Start New Task (Recommended)"
+
+### Changed
+- **Planning Flow Architecture** - Improved planning workflow separation (#93)
+  - planning-agent now outputs structured JSON instead of entering plan mode
+  - Orchestrator receives JSON, formats to markdown, enters plan mode
+  - Context-efficient: JSON with `=== PLAN_START ===` markers
+  - Clean separation: agent creates, orchestrator presents
+  - Removed EnterPlanMode tool from planning-agent
+- **Work Guidelines** - Added "No Summary Files" policy to CLAUDE.md
+  - Prohibited: `*_FIXES_APPLIED.md`, `*_AUDIT.md`, `*_SUMMARY.md`
+  - Summary info goes in CHANGELOG.md or commit messages only
+  - Focus on work, not documentation about work
+
 ## [2.4.5] - 2026-01-18
 
 ### Fixed
