@@ -110,6 +110,36 @@ done
 
 echo
 
+# Configure MCP server
+echo "🔌 Configuring MCP server..."
+CONFIG_TOML="$CODEX_CONFIG_DIR/config.toml"
+
+# Convert repo path to forward slashes for config
+MCP_PATH="${REPO_ROOT//\\//}"
+
+# Check if config.toml exists and has MCP section
+if [ -f "$CONFIG_TOML" ]; then
+  # Remove old awesome-slash MCP config if exists
+  if grep -q "\[mcp_servers.awesome-slash\]" "$CONFIG_TOML" 2>/dev/null; then
+    # Use sed to remove the old section (everything between [mcp_servers.awesome-slash] and next section or EOF)
+    sed -i '/\[mcp_servers.awesome-slash\]/,/^\[/{ /^\[mcp_servers.awesome-slash\]/d; /^\[/!d; }' "$CONFIG_TOML" 2>/dev/null || true
+  fi
+fi
+
+# Append MCP server config
+cat >> "$CONFIG_TOML" << EOF
+
+[mcp_servers.awesome-slash]
+command = "node"
+args = ["${MCP_PATH}/mcp-server/index.js"]
+
+[mcp_servers.awesome-slash.env]
+PLUGIN_ROOT = "${MCP_PATH}"
+EOF
+
+echo "  ✓ Added MCP server to config.toml"
+echo
+
 # Create README
 cat > "$CODEX_CONFIG_DIR/AWESOME_SLASH_README.md" << 'EOF'
 # awesome-slash for Codex CLI

@@ -126,6 +126,65 @@ chmod +x "$OPENCODE_COMMANDS_DIR/env.sh"
 echo "  ✓ Created environment setup script"
 echo
 
+# Configure MCP server
+echo "🔌 Configuring MCP server..."
+OPENCODE_GLOBAL_CONFIG_DIR="${HOME}/.config/opencode"
+CONFIG_JSON="$OPENCODE_GLOBAL_CONFIG_DIR/opencode.json"
+
+# Convert repo path to forward slashes for config
+MCP_PATH="${REPO_ROOT//\\//}"
+
+# Ensure config directory exists
+mkdir -p "$OPENCODE_GLOBAL_CONFIG_DIR"
+
+# Create or update opencode.json with MCP config
+if [ -f "$CONFIG_JSON" ]; then
+  # Check if we have jq for proper JSON manipulation
+  if command -v jq &> /dev/null; then
+    # Update existing config with jq
+    jq --arg path "$MCP_PATH" '.mcp["awesome-slash"] = {
+      "type": "local",
+      "command": ["node", ($path + "/mcp-server/index.js")],
+      "environment": {"PLUGIN_ROOT": $path},
+      "enabled": true
+    }' "$CONFIG_JSON" > "$CONFIG_JSON.tmp" && mv "$CONFIG_JSON.tmp" "$CONFIG_JSON"
+  else
+    # Fallback: Use node to update JSON
+    node -e "
+      const fs = require('fs');
+      const config = JSON.parse(fs.readFileSync('$CONFIG_JSON', 'utf8'));
+      config.mcp = config.mcp || {};
+      config.mcp['awesome-slash'] = {
+        type: 'local',
+        command: ['node', '$MCP_PATH/mcp-server/index.js'],
+        environment: { PLUGIN_ROOT: '$MCP_PATH' },
+        enabled: true
+      };
+      fs.writeFileSync('$CONFIG_JSON', JSON.stringify(config, null, 2));
+    "
+  fi
+else
+  # Create new config
+  cat > "$CONFIG_JSON" << EOF
+{
+  "mcp": {
+    "awesome-slash": {
+      "type": "local",
+      "command": ["node", "${MCP_PATH}/mcp-server/index.js"],
+      "environment": {
+        "PLUGIN_ROOT": "${MCP_PATH}"
+      },
+      "enabled": true
+    }
+  },
+  "\$schema": "https://opencode.ai/config.json"
+}
+EOF
+fi
+
+echo "  ✓ Added MCP server to opencode.json"
+echo
+
 # Create README
 cat > "$OPENCODE_COMMANDS_DIR/README.md" << 'EOF'
 # awesome-slash for OpenCode
