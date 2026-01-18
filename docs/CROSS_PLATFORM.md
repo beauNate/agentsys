@@ -155,13 +155,11 @@ When using the MCP server integration, these tools become available:
 | Tool | Description |
 |------|-------------|
 | `workflow_status` | Get current workflow state |
-| `workflow_start` | Start a new workflow |
-| `workflow_resume` | Resume from checkpoint |
-| `workflow_abort` | Cancel and cleanup |
-| `task_discover` | Find and prioritize tasks |
-| `task_implement` | Implement selected task |
-| `review_code` | Run multi-agent review |
-| `ship_pr` | Create and merge PR |
+| `workflow_start` | Start a new workflow with policy settings |
+| `workflow_resume` | Resume from last checkpoint |
+| `workflow_abort` | Cancel workflow and cleanup resources |
+| `task_discover` | Find and prioritize tasks from gh-issues, linear, or tasks-md |
+| `review_code` | Run pattern-based code review on changed files |
 
 ## Shared Libraries
 
