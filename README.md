@@ -40,67 +40,70 @@ git clone https://github.com/avifenesh/awesome-slash.git
 
 ## Available Commands
 
-### 📋 `/next-task:next-task` - Master Workflow Orchestrator
+### `/next-task` - Master Workflow Orchestrator
 
 Complete task-to-production automation with state management and resume capability.
 
 ```bash
-/next-task:next-task                   # Start new workflow with policy selection
-/next-task:next-task --status          # Check current workflow state
-/next-task:next-task --resume          # Resume from last checkpoint
-/next-task:next-task --abort           # Cancel workflow and cleanup
-/next-task:next-task bug               # Filter by task type
+/next-task                        # Start new workflow with policy selection
+/next-task --status               # Check current workflow state
+/next-task --resume               # Resume from last checkpoint
+/next-task --abort                # Cancel workflow and cleanup
+/next-task bug                    # Filter by task type
 ```
 
-**13-Phase Autonomous Workflow:**
-1. Policy Selection → Ask user preferences via checkboxes
-2. Task Discovery → Find and prioritize tasks from GitHub/Linear/PLAN.md
-3. Worktree Setup → Create isolated development environment [sonnet]
-4. Exploration → Deep codebase analysis [opus]
-5. Planning → Design implementation plan [opus]
-6. **User Approval → Get plan approval (LAST human interaction)**
-7. Implementation → Execute the plan [opus]
-8. **Pre-Review Gates → deslop-work + test-coverage-checker [sonnet]**
-9. Review Loop → Multi-agent review until approved [opus]
-10. **Delivery Validation → Autonomous task completion check [sonnet]**
-11. **Docs Update → Auto-update related documentation [sonnet]**
-12. Ship → PR creation, CI monitoring, merge
-13. Cleanup → Remove worktree, update state
+**Workflow phases (tracked in `.claude/workflow-state.json`):**
+- policy-selection
+- task-discovery
+- worktree-setup
+- exploration
+- planning
+- user-approval
+- implementation
+- review-loop
+- delivery-approval
+- ship-prep
+- create-pr
+- ci-wait
+- comment-fix
+- merge
+- production-ci
+- deploy
+- production-release
+- complete
 
-**Features:**
-- **Fully autonomous** after plan approval - no human in the loop
-- Resume capability with `.claude/.workflow-state.json`
-- 18 specialist agents with model optimization (opus/sonnet)
-- Quality gates: deslop-work, test-coverage-checker, delivery-validator, docs-updater
-- SubagentStop hooks for automatic workflow transitions
+**Quality gates:**
+- deslop-work
+- test-coverage-checker
+- review-orchestrator
+- delivery-validator
+- docs-updater
+
+**Notes:**
+- Fully autonomous after plan approval
+- Resume capability with `.claude/workflow-state.json`
 - Policy-based stopping points (pr-created, merged, deployed, production)
+- /ship handles PR creation, CI monitoring, merge, and cleanup
 
 ---
 
-### 🚀 `/ship:ship` - Complete PR Workflow
+### `/ship` - Complete PR Workflow
 
 Ship your code from commit to production with full validation and state integration.
 
 ```bash
-/ship:ship                        # Default workflow
-/ship:ship --strategy rebase      # Rebase before merge
-/ship:ship --dry-run              # Show plan without executing
-/ship:ship --state-file PATH      # Integrate with next-task workflow
+/ship                             # Default workflow
+/ship --strategy rebase           # Rebase before merge
+/ship --dry-run                   # Show plan without executing
+/ship --state-file PATH           # Integrate with next-task workflow
 ```
 
-**12-Phase Workflow:**
-1. Pre-flight checks and platform detection
-2. Commit with AI-generated message
-3. Create PR with context
-4. Wait for CI
-5. Multi-agent review (code quality, silent failures, test coverage)
-6. Merge PR
-7. Deploy to development (if multi-branch)
-8. Validate development
-9. Deploy to production
-10. Validate production
-11. Cleanup
-12. Completion report
+**Stages:**
+- Pre-flight checks and platform detection
+- Commit and PR creation
+- CI wait and review loop
+- Merge and (optional) deploy validation
+- Cleanup and completion report
 
 **Platform Support:**
 - **CI:** GitHub Actions, GitLab CI, CircleCI, Jenkins, Travis CI
@@ -108,14 +111,14 @@ Ship your code from commit to production with full validation and state integrat
 
 ---
 
-### 🧹 `/deslop-around:deslop-around` - AI Slop Cleanup
+### `/deslop-around` - AI Slop Cleanup
 
 Remove debugging code, old TODOs, and AI slop from your codebase.
 
 ```bash
-/deslop-around:deslop-around               # Report mode - analyze only
-/deslop-around:deslop-around apply         # Apply fixes with verification
-/deslop-around:deslop-around apply src/ 10 # Fix up to 10 issues in src/
+/deslop-around                    # Report mode - analyze only
+/deslop-around apply              # Apply fixes with verification
+/deslop-around apply src/ 10      # Fix up to 10 issues in src/
 ```
 
 **Detects:**
@@ -126,29 +129,29 @@ Remove debugging code, old TODOs, and AI slop from your codebase.
 
 ---
 
-### 🔍 `/project-review:project-review` - Multi-Agent Code Review
+### `/project-review` - Multi-Agent Code Review
 
 Comprehensive code review with specialized agents that iterate until zero issues.
 
 ```bash
-/project-review:project-review              # Full codebase review
-/project-review:project-review --recent     # Only recent changes
-/project-review:project-review --domain security
+/project-review                   # Full codebase review
+/project-review --recent          # Only recent changes
+/project-review --domain security # Domain-focused review
 ```
 
-**8 Specialized Agents:**
-Security · Performance · Architecture · Testing · Error Handling · Code Quality · Type Safety · Documentation
+**Review domains:**
+Security, Performance, Architecture, Testing, Error Handling, Code Quality, Type Safety, Documentation
 
 ---
 
-### 📝 `/next-task:update-docs-around` - Documentation Sync
+### `/update-docs-around` - Documentation Sync
 
-Sync documentation with actual code state across the entire repository.
+Sync documentation with actual code state across the repository.
 
 ```bash
-/next-task:update-docs-around               # Report mode - analyze only
-/next-task:update-docs-around --apply       # Apply safe fixes
-/next-task:update-docs-around docs/ --apply # Sync specific directory
+/update-docs-around               # Report mode - analyze only
+/update-docs-around --apply       # Apply safe fixes
+/update-docs-around docs/ --apply # Sync specific directory
 ```
 
 **Checks:**
@@ -160,26 +163,26 @@ Sync documentation with actual code state across the entire repository.
 
 ---
 
-### ✅ `/next-task:delivery-approval` - Delivery Validation
+### `/delivery-approval` - Delivery Validation
 
 Validate task completion and approve for shipping (standalone or part of workflow).
 
 ```bash
-/next-task:delivery-approval                # Validate current work
-/next-task:delivery-approval --task-id 142  # Validate specific task
-/next-task:delivery-approval --verbose      # Show detailed check output
+/delivery-approval                # Validate current work
+/delivery-approval --task-id 142  # Validate specific task
+/delivery-approval --verbose      # Show detailed check output
 ```
 
-**Validation Checks:**
-- Tests pass (npm test)
-- Build passes (npm run build)
+**Validation checks:**
+- Tests pass
+- Build passes
 - Lint passes
 - Type check passes
 - Task requirements met
 
 ---
 
-### 🎯 `/reality-check:scan` - Plan Drift Detection
+### `/reality-check:scan` - Plan Drift Detection
 
 Deep repository analysis to identify where documented plans diverge from actual code reality.
 
@@ -188,30 +191,11 @@ Deep repository analysis to identify where documented plans diverge from actual 
 /reality-check:set            # Configure scan settings
 ```
 
-**Multi-Agent Parallel Scan:**
-1. **Issue Scanner** - Analyzes GitHub issues, PRs, milestones
-2. **Doc Analyzer** - Examines README, PLAN.md, CLAUDE.md, docs/
-3. **Code Explorer** - Deep codebase structure and feature analysis
-4. **Plan Synthesizer** - Combines findings and creates prioritized plan
-
-**Detects:**
-- Plan stagnation (low completion rates)
-- Priority neglect (stale high-priority issues)
-- Documentation lag (features not documented)
-- Scope overcommit (documented but not implemented)
-- Missing tests, outdated docs, overdue milestones
-
-**Output:**
-- Drift analysis with severity ratings
-- Gap identification (missing tests, docs, CI)
-- Cross-reference: documented vs implemented features
-- Prioritized reconstruction plan (immediate, short-term, medium-term)
-
-**First-Run Setup:**
-Interactive checkboxes configure:
-- Data sources (GitHub, Linear, docs, code)
-- Scan depth (quick, medium, thorough)
-- Output format (file, display, both)
+**Multi-agent parallel scan:**
+1. Issue scanner - analyzes GitHub issues, PRs, milestones
+2. Doc analyzer - examines README, PLAN.md, CLAUDE.md, docs/
+3. Code explorer - deep codebase structure and feature analysis
+4. Plan synthesizer - combines findings into prioritized plan
 
 ---
 
@@ -226,7 +210,7 @@ All platforms share the same workflow tools via MCP (Model Context Protocol):
 | `workflow_resume` | Resume from checkpoint |
 | `workflow_abort` | Cancel and cleanup |
 | `task_discover` | Find and prioritize tasks |
-| `review_code` | Run multi-agent review |
+| `review_code` | Run pattern-based code review | 
 
 See [docs/CROSS_PLATFORM.md](./docs/CROSS_PLATFORM.md) for details.
 
@@ -284,7 +268,7 @@ See [lib/config/README.md](./lib/config/README.md) for complete documentation an
 
 ### State Management
 
-Workflows persist state in `.claude/.workflow-state.json`:
+Workflows persist state in `.claude/workflow-state.json`:
 
 ```json
 {
@@ -311,7 +295,7 @@ Workflows persist state in `.claude/.workflow-state.json`:
 |-------|---------|
 | deslop-work | Clean AI slop from new work (committed but unpushed) |
 | test-coverage-checker | Validate new work has test coverage |
-| delivery-validator | Autonomous delivery validation (NOT manual) |
+| delivery-validator | Autonomous delivery validation (not manual) |
 | docs-updater | Update docs related to changes |
 
 **Operational (Sonnet - Infrastructure):**
@@ -321,6 +305,8 @@ Workflows persist state in `.claude/.workflow-state.json`:
 | task-discoverer | Find and prioritize tasks |
 | worktree-manager | Create isolated worktrees |
 | ci-monitor | Monitor CI/PR status with sleep loops |
+| ci-fixer | Fix CI failures and review comments |
+| simple-fixer | Execute predefined code fixes |
 
 **Reality Check (Sonnet + Opus - Plan Drift Detection):**
 | Agent | Purpose |
@@ -336,26 +322,26 @@ Workflows persist state in `.claude/.workflow-state.json`:
 
 ```
 awesome-slash/
-├── .claude-plugin/
-│   └── marketplace.json      # Claude Code marketplace manifest
-├── plugins/
-│   ├── next-task/           # Master workflow orchestrator
-│   │   ├── commands/        # next-task, update-docs-around, delivery-approval
-│   │   ├── agents/          # 18 specialist agents
-│   │   └── hooks/           # SubagentStop hooks for workflow automation
-│   ├── ship/                # PR workflow
-│   ├── deslop-around/       # AI slop cleanup
-│   ├── project-review/      # Multi-agent review
-│   └── reality-check/       # Plan drift detection
-├── lib/
-│   ├── config/              # Configuration management
-│   ├── state/               # Workflow state management
-│   ├── platform/            # Auto-detection
-│   ├── patterns/            # Code analysis patterns
-│   └── utils/               # Shell escaping and context optimization
-├── mcp-server/              # Cross-platform MCP server
-├── scripts/install/         # Platform installers
-└── docs/
+|-- .claude-plugin/
+|   |-- marketplace.json      # Claude Code marketplace manifest
+|-- plugins/
+|   |-- next-task/             # Master workflow orchestrator
+|   |   |-- commands/          # next-task, update-docs-around, delivery-approval
+|   |   |-- agents/            # Specialist agents
+|   |   |-- hooks/             # SubagentStop hooks for workflow automation
+|   |-- ship/                  # PR workflow
+|   |-- deslop-around/         # AI slop cleanup
+|   |-- project-review/        # Multi-agent review
+|   |-- reality-check/         # Plan drift detection
+|-- lib/
+|   |-- config/                # Configuration management
+|   |-- state/                 # Workflow state management
+|   |-- platform/              # Auto-detection
+|   |-- patterns/              # Code analysis patterns
+|   |-- utils/                 # Shell escaping and context optimization
+|-- mcp-server/                # Cross-platform MCP server
+|-- scripts/install/           # Platform installers
+|-- docs/
 ```
 
 ---
@@ -365,6 +351,8 @@ awesome-slash/
 **Required:**
 - Git
 - Node.js 18+
+
+**Required for GitHub-backed workflows:**
 - GitHub CLI (`gh`) with authentication
 
 **For Claude Code:**
@@ -380,11 +368,11 @@ awesome-slash/
 
 ## Contributing
 
-Contributions welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md).
+Contributions welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License
 
-MIT © [Avi Fenesh](https://github.com/avifenesh)
+MIT - [Avi Fenesh](https://github.com/avifenesh)
 
 ## Support
 
@@ -393,4 +381,4 @@ MIT © [Avi Fenesh](https://github.com/avifenesh)
 
 ---
 
-Made with ❤️ for the AI coding community
+Made with care for the AI coding community
