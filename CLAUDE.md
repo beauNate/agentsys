@@ -19,31 +19,6 @@ See @README.md for project overview and @CONTRIBUTING.md for guidelines.
 
 ---
 
-## Version Update Checklist
-
-When releasing a new version, update **ALL** these locations:
-
-| File | Location | Example |
-|------|----------|---------|
-| `package.json` | `"version": "X.Y.Z"` | `"version": "2.5.0"` |
-| `README.md` | Version badge | `version-2.5.0-blue` |
-| `README.md` | "What's New" section | Add new version section |
-| `.claude-plugin/plugin.json` | `"version": "X.Y.Z"` | `"version": "2.5.0"` |
-| `.claude-plugin/marketplace.json` | `"version"` (appears 6x) | All version fields |
-| `plugins/next-task/.claude-plugin/plugin.json` | `"version": "X.Y.Z"` | `"version": "2.5.0"` |
-| `plugins/ship/.claude-plugin/plugin.json` | `"version": "X.Y.Z"` | `"version": "2.5.0"` |
-| `plugins/deslop-around/.claude-plugin/plugin.json` | `"version": "X.Y.Z"` | `"version": "2.5.0"` |
-| `plugins/project-review/.claude-plugin/plugin.json` | `"version": "X.Y.Z"` | `"version": "2.5.0"` |
-| `plugins/reality-check/.claude-plugin/plugin.json` | `"version": "X.Y.Z"` | `"version": "2.5.0"` |
-| `CHANGELOG.md` | New entry at top | `## [2.5.0] - YYYY-MM-DD` |
-
-**Version Types:**
-- **Patch (x.x.X)**: Bug fixes, security patches, docs updates
-- **Minor (x.X.0)**: New features, non-breaking changes
-- **Major (X.0.0)**: Breaking changes, API changes
-
----
-
 ## Project Purpose & Development Philosophy
 
 ### What This Project Is
@@ -86,17 +61,6 @@ State should be **simple and flat**:
 
 ---
 
-## Release Process
-
-All releases include **both npm publish and GitHub tag**:
-
-```bash
-npm version patch && git push origin main --tags && npm publish
-gh release create vX.Y.Z --title "vX.Y.Z" --notes "See CHANGELOG.md"
-```
-
----
-
 ## PR Auto-Review Process
 
 > **CRITICAL**: Every PR receives automatic reviews from **4 agents**:
@@ -118,87 +82,17 @@ gh release create vX.Y.Z --title "vX.Y.Z" --notes "See CHANGELOG.md"
 
 ---
 
-## Agent Responsibilities & Required Tools
+## Workflow Essentials
 
-### /next-task - Master Workflow Orchestrator
+**MUST-CALL Agents** (cannot skip in /next-task):
+- `exploration-agent` - before planning
+- `planning-agent` - before implementation
+- `review-orchestrator` - before shipping
+- `delivery-validator` - before /ship
 
-The main orchestrator **MUST spawn these agents in order**:
+**PR Review Loop**: Wait 3 min for auto-reviewers (Copilot, Claude, Gemini, Codex), address ALL comments.
 
-| Phase | Agent | Model | Required Tools | Purpose |
-|-------|-------|-------|----------------|---------|
-| 1 | *(orchestrator)* | - | AskUserQuestion | Configure workflow policy (direct questions) |
-| 2 | `task-discoverer` | sonnet | Bash(gh:*), Bash(glab:*), Read | Find and prioritize tasks |
-| 3 | `worktree-manager` | haiku | Bash(git:*) | Create isolated worktree |
-| 4 | `exploration-agent` | opus | Read, Grep, Glob, LSP, Task | Deep codebase analysis |
-| 5 | `planning-agent` | opus | Read, Grep, Glob, Bash(git:*), Task | Design implementation plan |
-| 6 | **USER APPROVAL** | - | - | Last human touchpoint |
-| 7 | `implementation-agent` | opus | Read, Write, Edit, Bash | Execute plan |
-| 8 | `deslop-work` | sonnet | Read, Grep, Task(simple-fixer) | Clean AI slop |
-| 8 | `test-coverage-checker` | sonnet | Bash(npm:*), Read, Grep | Validate test coverage |
-| 9 | `review-orchestrator` | opus | Task(*-reviewer) | Multi-agent review loop |
-| 10 | `delivery-validator` | sonnet | Bash(npm:*), Read | Validate completion |
-| 11 | `docs-updater` | sonnet | Read, Edit, Task(simple-fixer) | Update documentation |
-| 12 | `/ship` command | - | - | PR creation and merge |
-
-### MUST-CALL Agents (Cannot Skip)
-
-- **`exploration-agent`** - Required for understanding codebase before planning
-- **`planning-agent`** - Required for creating implementation plan
-- **`review-orchestrator`** - Required for code review before shipping
-- **`delivery-validator`** - Required before calling /ship
-
-### /ship - PR Workflow
-
-The ship command **MUST execute these phases**:
-
-| Phase | Responsibility | Required Tools |
-|-------|----------------|----------------|
-| 1-3 | Pre-flight, commit, create PR | Bash(git:*), Bash(gh:*) |
-| 4 | **CI & Review Monitor Loop** | Bash(gh:*), Task(ci-fixer) |
-| 5 | Internal review (standalone only) | Task(*-reviewer) |
-| 6 | Merge PR | Bash(gh:*) |
-| 7-10 | Deploy & validate | Bash(deployment:*) |
-
-> **Phase 4 is MANDATORY** - even when called from /next-task.
-> External auto-reviewers (Copilot, Claude, Gemini, Codex) comment AFTER PR creation.
-
-### ci-monitor Agent
-
-**Responsibility:** Monitor CI and PR comments, delegate fixes.
-
-**Required Tools:**
-- `Bash(gh:*)` - Check CI status and PR comments
-- `Task(ci-fixer)` - Delegate fixes to ci-fixer agent
-
-**Must Follow:**
-1. Wait 3 minutes for auto-reviews on first iteration
-2. Check ALL 4 reviewers (Copilot, Claude, Gemini, Codex)
-3. Iterate until zero unresolved threads
-
-### ci-fixer Agent
-
-**Responsibility:** Fix CI failures and address PR comments.
-
-**Required Tools:**
-- `Read` - Read failing files
-- `Edit` - Apply fixes
-- `Bash(npm:*)` - Run tests
-- `Bash(git:*)` - Commit and push fixes
-
-**Must Follow:**
-1. Address EVERY comment, including minor/nit suggestions
-2. Reply to each comment explaining the fix
-3. Resolve thread only after addressing
-
----
-
-## Agent Tool Restrictions
-
-| Agent | Allowed Tools | Disallowed |
-|-------|---------------|------------|
-| worktree-manager | Bash(git:*) | Write, Edit |
-| ci-monitor | Bash(gh:*), Read, Task | Write, Edit |
-| simple-fixer | Read, Edit, Bash(git:*) | Task |
+See `agent-docs/workflow.md` for full agent tables and tool requirements.
 
 ---
 
@@ -247,4 +141,5 @@ The ship command **MUST execute these phases**:
 | CI review loop | `plugins/ship/commands/ship-ci-review-loop.md` |
 | State management | `lib/state/workflow-state.js` |
 | Plugin manifest | `.claude-plugin/plugin.json` |
+| **Release checklist** | `agent-docs/release.md` |
 

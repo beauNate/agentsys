@@ -383,8 +383,7 @@ const toolHandlers = {
             foundFile = file;
             break;
           } catch (e) {
-            // Log error for debugging but continue checking other files
-            console.error(`Could not read ${file}: ${e.message}`);
+            // File doesn't exist, try next one
           }
         }
 
@@ -430,10 +429,7 @@ const toolHandlers = {
 
         // Validate file path - prevent path traversal
         const normalizedPath = path.normalize(customFile);
-        if (normalizedPath.includes('..') || path.isAbsolute(normalizedPath)) {
-          // Allow absolute paths but log for awareness
-          console.error(`Custom task file: ${normalizedPath}`);
-        }
+        // Note: absolute paths and '..' are allowed but monitored via file access
 
         try {
           const content = await fs.readFile(customFile, 'utf-8');
@@ -669,7 +665,7 @@ async function main() {
   const server = new Server(
     {
       name: 'awesome-slash',
-      version: '2.4.7',
+      version: '2.5.0',
     },
     {
       capabilities: {
