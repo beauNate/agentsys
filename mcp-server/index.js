@@ -178,7 +178,7 @@ const toolHandlers = {
     return {
       content: [{
         type: 'text',
-        text: `Workflow started: ${state.workflow.id}\nPolicy: ${JSON.stringify(policy, null, 2)}`
+        text: `Workflow started: ${state.task.id}\nPolicy: ${JSON.stringify(policy, null, 2)}`
       }]
     };
   },
@@ -199,7 +199,7 @@ const toolHandlers = {
       };
     }
 
-    if (!state.checkpoints?.canResume) {
+    if (state.status !== 'in_progress' || state.phase === 'complete') {
       return {
         content: [{ type: 'text', text: 'Workflow cannot be resumed from current state.' }],
         isError: true
@@ -209,7 +209,7 @@ const toolHandlers = {
     return {
       content: [{
         type: 'text',
-        text: `Resuming workflow ${state.workflow.id} from phase: ${state.checkpoints.resumeFrom}`
+        text: `Resuming workflow ${state.task.id} from phase: ${state.phase}`
       }]
     };
   },
@@ -234,7 +234,7 @@ const toolHandlers = {
     return {
       content: [{
         type: 'text',
-        text: `Workflow ${state.workflow.id} aborted. Cleanup: worktree and branches should be removed manually.`
+        text: `Workflow ${state.task.id} aborted. Cleanup: worktree and branches should be removed manually.`
       }]
     };
   },

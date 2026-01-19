@@ -243,9 +243,17 @@ See [docs/CROSS_PLATFORM.md](./docs/CROSS_PLATFORM.md) for details.
 
 ### State Management
 
-Simple state tracking with three locations:
+Simple state tracking with platform-aware directories:
 
-**Main project: `.claude/tasks.json`** - Tracks active worktree/task:
+| Platform | State Directory |
+|----------|-----------------|
+| Claude Code | `.claude/` |
+| OpenCode | `.opencode/` |
+| Codex CLI | `.codex/` |
+
+Override with `AI_STATE_DIR` environment variable.
+
+**Main project: `{state-dir}/tasks.json`** - Tracks active worktree/task:
 ```json
 {
   "active": {
@@ -257,7 +265,7 @@ Simple state tracking with three locations:
 }
 ```
 
-**Worktree: `.claude/flow.json`** - Tracks workflow progress:
+**Worktree: `{state-dir}/flow.json`** - Tracks workflow progress:
 ```json
 {
   "task": { "id": "123", "title": "Fix auth timeout" },
@@ -270,7 +278,7 @@ Simple state tracking with three locations:
 }
 ```
 
-**Source Preferences: `.claude/sources/preference.json`** - Caches task source selection:
+**Source Preferences: `{state-dir}/sources/preference.json`** - Caches task source selection:
 ```json
 {
   "source": "custom",

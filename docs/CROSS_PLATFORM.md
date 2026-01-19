@@ -182,36 +182,65 @@ lib/
     └── context-optimizer.js   # Git command optimization
 ```
 
+## Platform-Aware State Directories
+
+State files are stored in platform-specific directories:
+
+| Platform | State Directory |
+|----------|-----------------|
+| Claude Code | `.claude/` |
+| OpenCode | `.opencode/` |
+| Codex CLI | `.codex/` |
+
+The plugin auto-detects the platform and uses the appropriate directory. Override with `AI_STATE_DIR` environment variable.
+
+**Files stored in state directory:**
+- `tasks.json` - Active task tracking (main project)
+- `flow.json` - Workflow progress (worktree)
+- `sources/preference.json` - Task source preferences
+
 ## Platform-Specific Considerations
 
 ### Claude Code
 - Full plugin support with hooks, agents, commands
+- State directory: `.claude/`
 - Native state management integration
 - Best experience with opus model for complex tasks
 
 ### OpenCode
 - Works with any model provider (Claude, OpenAI, Google, local)
-- Agent definitions in Markdown format
+- State directory: `.opencode/`
+- Slash commands in `~/.config/opencode/commands/`
+- Agent definitions in `~/.config/opencode/agents/`
 - Custom tools via MCP
 
 ### Codex CLI
 - OpenAI-native with GPT-5-Codex
-- Skills system for custom actions
+- State directory: `.codex/`
+- Skills in `~/.codex/skills/`
 - MCP for external tools
 
 ## Migration Guide
 
 ### From Claude Code to OpenCode
 
-1. Copy workflow state file: `.claude/workflow-state.json`
-2. Install MCP server (recommended) or use agent conversion script
-3. Configure OpenCode MCP settings
+1. Run the OpenCode installer: `./scripts/install/opencode.sh`
+2. State files will be created fresh in `.opencode/`
+3. Or copy state: `cp -r .claude/* .opencode/`
 
 ### From Claude Code to Codex
 
-1. Copy workflow state file: `.claude/workflow-state.json`
-2. Install MCP server (recommended)
-3. Configure Codex MCP settings
+1. Run the Codex installer: `./scripts/install/codex.sh`
+2. State files will be created fresh in `.codex/`
+3. Or copy state: `cp -r .claude/* .codex/`
+
+### Using Multiple Platforms
+
+If you use multiple AI assistants on the same project, set `AI_STATE_DIR` to share state:
+
+```bash
+export AI_STATE_DIR=".ai-state"
+```
 
 ## Contributing
 
