@@ -187,6 +187,16 @@ function installForOpenCode(installDir) {
 
   fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
 
+  // Remove old/deprecated command files
+  const oldCommands = ['reality-check-set.md', 'pr-merge.md'];
+  for (const oldCmd of oldCommands) {
+    const oldPath = path.join(commandsDir, oldCmd);
+    if (fs.existsSync(oldPath)) {
+      fs.unlinkSync(oldPath);
+      console.log(`  Removed deprecated: ${oldCmd}`);
+    }
+  }
+
   // Sync command files
   const commandMappings = [
     ['next-task.md', 'next-task', 'next-task.md'],
@@ -252,6 +262,16 @@ enabled = true
   }
 
   fs.writeFileSync(configPath, configContent);
+
+  // Remove old/deprecated skill directories
+  const oldSkills = ['reality-check-set', 'pr-merge'];
+  for (const oldSkill of oldSkills) {
+    const oldPath = path.join(skillsDir, oldSkill);
+    if (fs.existsSync(oldPath)) {
+      fs.rmSync(oldPath, { recursive: true, force: true });
+      console.log(`  Removed deprecated: ${oldSkill}`);
+    }
+  }
 
   // Sync skill files (add name field required by Codex)
   const skillMappings = [
