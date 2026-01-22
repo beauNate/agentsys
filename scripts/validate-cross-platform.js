@@ -39,9 +39,10 @@ const crossPlatformPatterns = {
   },
   claude_md_reference: {
     pattern: /CLAUDE\.md/i,
+    exclude: /AGENTS\.md/i,  // If also mentions AGENTS.md, it's cross-platform aware
     certainty: 'MEDIUM',
-    issue: 'References CLAUDE.md',
-    fix: 'Use generic term or check for both CLAUDE.md and AGENTS.md'
+    issue: 'References CLAUDE.md without AGENTS.md',
+    fix: 'Also check for AGENTS.md (used by OpenCode/Codex)'
   },
   hardcoded_windows_path: {
     pattern: /[A-Z]:\\(?:Users|Program Files)/i,
