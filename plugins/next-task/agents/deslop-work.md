@@ -119,9 +119,11 @@ return\s+(0|true|false|null|undefined|\[\]|\{\})\s*;?\s*$
 ```
 Use Edit tool:
 - file_path: <the file>
-- old_string: <the line with console.log>
-- new_string: <empty string or remove the line>
+- old_string: "  console.log('debug');\n" (include full line with indentation and newline)
+- new_string: "" (empty string to delete the line)
 ```
+
+**Note**: When removing a line, include the trailing newline `\n` in old_string and use empty string for new_string.
 
 ### For MEDIUM Certainty Findings
 
@@ -145,8 +147,11 @@ Use Edit tool:
 
 If any fixes were applied:
 
+1. Stage only the files you modified (use specific file names, not `git add -A`)
+2. Commit with descriptive message:
+
 ```bash
-git add -A && git commit -m "fix: clean up AI slop (debugging, placeholders)"
+git add <modified-file-1> <modified-file-2> && git commit -m "fix: clean up AI slop (debugging, placeholders)"
 ```
 
 If no fixes were needed, report **"No slop found in changed files"**.
