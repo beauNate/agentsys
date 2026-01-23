@@ -26,6 +26,7 @@ const execAsync = promisify(exec);
 const workflowState = require('../lib/state/workflow-state.js');
 const { runPipeline, formatHandoffPrompt, CERTAINTY, THOROUGHNESS } = require('../lib/patterns/pipeline.js');
 const crossPlatform = require('../lib/cross-platform/index.js');
+const enhance = require('../lib/enhance/index.js');
 
 // Plugin root for relative paths
 const PLUGIN_ROOT = process.env.PLUGIN_ROOT || path.join(__dirname, '..');
@@ -158,6 +159,34 @@ const TOOLS = [
         compact: {
           type: 'boolean',
           description: 'Use compact table format (60% fewer tokens)'
+        }
+      },
+      required: []
+    }
+  },
+  {
+    name: 'enhance_analyze',
+    description: 'Analyze plugins, agents, docs, or prompts for enhancement opportunities',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: {
+          type: 'string',
+          description: 'Directory to analyze (default: current directory)'
+        },
+        focus: {
+          type: 'string',
+          enum: ['all', 'plugin', 'agent', 'docs', 'claudemd', 'prompt'],
+          description: 'Which analyzer to run (default: all)'
+        },
+        mode: {
+          type: 'string',
+          enum: ['report', 'apply'],
+          description: 'Report only or apply HIGH certainty fixes (default: report)'
+        },
+        compact: {
+          type: 'boolean',
+          description: 'Use compact output format (default: true)'
         }
       },
       required: []
@@ -638,6 +667,145 @@ const toolHandlers = {
     } catch (error) {
       console.error('Error during slop detection:', error);
       return crossPlatform.errorResponse('Slop detection failed. Check server logs.');
+    }
+  },
+
+  async enhance_analyze({ path: scanPath, focus, mode, compact }) {
+    try {
+      const targetPath = scanPath || process.cwd();
+      const analyzerFocus = focus || 'all';
+      const analyzeMode = mode || 'report';
+
+      // Validate path exists
+      try {
+        await fs.access(targetPath);
+      } catch (e) {
+        return crossPlatform.errorResponse(`Path not found: ${targetPath}`);
+      }
+
+      const allFindings = [];
+      const summary = { plugin: 0, agent: 0, docs: 0, claudemd: 0, prompt: 0 };
+
+      // Run analyzers based on focus
+      if (analyzerFocus === 'all' || analyzerFocus === 'plugin') {
+        try {
+          const result = enhance.analyzeAllPlugins(targetPath);
+          if (result && result.findings) {
+            allFindings.push(...result.findings.map(f => ({ ...f, analyzer: 'plugin' })));
+            summary.plugin = result.findings.length;
+          }
+        } catch (e) {
+          console.error('Plugin analyzer error:', e.message);
+        }
+      }
+
+      if (analyzerFocus === 'all' || analyzerFocus === 'agent') {
+        try {
+          const result = enhance.analyzeAllAgents(targetPath);
+          if (result && result.findings) {
+            allFindings.push(...result.findings.map(f => ({ ...f, analyzer: 'agent' })));
+            summary.agent = result.findings.length;
+          }
+        } catch (e) {
+          console.error('Agent analyzer error:', e.message);
+        }
+      }
+
+      if (analyzerFocus === 'all' || analyzerFocus === 'docs') {
+        try {
+          const result = enhance.analyzeAllDocs(targetPath);
+          if (result && result.findings) {
+            allFindings.push(...result.findings.map(f => ({ ...f, analyzer: 'docs' })));
+            summary.docs = result.findings.length;
+          }
+        } catch (e) {
+          console.error('Docs analyzer error:', e.message);
+        }
+      }
+
+      if (analyzerFocus === 'all' || analyzerFocus === 'claudemd') {
+        try {
+          const result = enhance.analyzeProjectMemory(targetPath);
+          if (result && result.findings) {
+            allFindings.push(...result.findings.map(f => ({ ...f, analyzer: 'claudemd' })));
+            summary.claudemd = result.findings.length;
+          }
+        } catch (e) {
+          console.error('Project memory analyzer error:', e.message);
+        }
+      }
+
+      if (analyzerFocus === 'all' || analyzerFocus === 'prompt') {
+        try {
+          const result = enhance.analyzeAllPrompts(targetPath);
+          if (result && result.findings) {
+            allFindings.push(...result.findings.map(f => ({ ...f, analyzer: 'prompt' })));
+            summary.prompt = result.findings.length;
+          }
+        } catch (e) {
+          console.error('Prompt analyzer error:', e.message);
+        }
+      }
+
+      // Deduplicate if running all analyzers
+      let findings = allFindings;
+      if (analyzerFocus === 'all' && enhance.deduplicateOrchestratorFindings) {
+        findings = enhance.deduplicateOrchestratorFindings(allFindings);
+      }
+
+      // Sort by certainty
+      const certaintyOrder = { HIGH: 0, MEDIUM: 1, LOW: 2 };
+      findings.sort((a, b) => (certaintyOrder[a.certainty] || 2) - (certaintyOrder[b.certainty] || 2));
+
+      // Apply fixes if requested
+      let fixResults = null;
+      if (analyzeMode === 'apply') {
+        const highCertaintyFixes = findings.filter(f => f.certainty === 'HIGH' && f.autoFix);
+        if (highCertaintyFixes.length > 0) {
+          fixResults = { attempted: highCertaintyFixes.length, applied: 0 };
+          for (const fix of highCertaintyFixes) {
+            try {
+              if (fix.analyzer === 'plugin') enhance.applyFixes([fix]);
+              else if (fix.analyzer === 'agent') enhance.agentApplyFixes([fix]);
+              else if (fix.analyzer === 'docs') enhance.docsApplyFixes([fix]);
+              else if (fix.analyzer === 'claudemd') enhance.projectMemoryApplyFixes([fix]);
+              else if (fix.analyzer === 'prompt') enhance.promptApplyFixes([fix]);
+              fixResults.applied++;
+            } catch (e) {
+              console.error(`Fix failed for ${fix.file}:`, e.message);
+            }
+          }
+        }
+      }
+
+      // Format output
+      const useCompact = compact !== false;
+      const byCertainty = { HIGH: 0, MEDIUM: 0, LOW: 0 };
+      findings.forEach(f => { byCertainty[f.certainty] = (byCertainty[f.certainty] || 0) + 1; });
+
+      return crossPlatform.successResponse({
+        path: targetPath,
+        focus: analyzerFocus,
+        mode: analyzeMode,
+        total: findings.length,
+        byCertainty,
+        byAnalyzer: summary,
+        autoFixable: findings.filter(f => f.autoFix).length,
+        fixResults,
+        findings: useCompact
+          ? findings.slice(0, 30).map(f => ({
+              file: f.file,
+              line: f.line,
+              certainty: f.certainty,
+              issue: f.issue,
+              analyzer: f.analyzer
+            }))
+          : findings.slice(0, 50)
+      });
+
+    } catch (error) {
+      console.error('Error during enhance analysis:', error);
+      return crossPlatform.errorResponse('Enhance analysis failed. Check server logs.');
     }
   }
 };

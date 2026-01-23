@@ -409,6 +409,8 @@ All platforms share the same workflow tools via MCP (Model Context Protocol):
 | `workflow_abort` | Cancel and cleanup |
 | `task_discover` | Find and prioritize tasks |
 | `review_code` | Run pattern-based code review |
+| `slop_detect` | Detect AI slop patterns |
+| `enhance_analyze` | Analyze plugins, agents, docs for enhancements |
 
 See [docs/CROSS_PLATFORM.md](./docs/CROSS_PLATFORM.md) for details.
 

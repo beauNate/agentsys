@@ -237,7 +237,8 @@ function installForOpenCode(installDir) {
   console.log('✅ OpenCode installation complete!');
   console.log(`   Config: ${configPath}`);
   console.log(`   Commands: ${commandsDir}`);
-  console.log('   MCP tools: workflow_status, workflow_start, workflow_resume, task_discover, review_code, slop_detect\n');
+  console.log('   Access via: /next-task, /ship, /deslop-around, /project-review, /reality-check-scan, /enhance');
+  console.log('   MCP tools: workflow_status, workflow_start, workflow_resume, task_discover, review_code, slop_detect, enhance_analyze\n');
   return true;
 }
 
@@ -370,7 +371,7 @@ AI_STATE_DIR = ".codex"
   console.log(`   Config: ${configPath}`);
   console.log(`   Skills: ${skillsDir}`);
   console.log('   Access via: $next-task, $ship, $deslop-around, etc.');
-  console.log('   MCP tools: workflow_status, workflow_start, workflow_resume, task_discover, review_code, slop_detect\n');
+  console.log('   MCP tools: workflow_status, workflow_start, workflow_resume, task_discover, review_code, slop_detect, enhance_analyze\n');
   return true;
 }
 
