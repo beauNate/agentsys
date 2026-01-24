@@ -28,6 +28,14 @@ Quick reference for AI assistants. Follow links for details.
    - MCP server update → `checklists/update-mcp.md`
    - OpenCode plugin update → `checklists/update-opencode-plugin.md`
    *WHY: Multi-file changes have hidden dependencies. Checklists prevent missed updates.*
+
+6. **Post-creation validation** - After creating/modifying commands, agents, or prompts:
+   - Run `/enhance` on the new/modified files to validate quality
+   - Check `checklists/cross-platform-compatibility.md` for platform requirements
+   - Verify OpenCode compatibility (30-char labels, `PLUGIN_ROOT` env var)
+   - Verify Codex compatibility (trigger-phrase descriptions, SKILL.md format)
+   - Update `bin/cli.js` mappings if new command/agent added
+   *WHY: We support 3 platforms. Every feature must work on Claude Code, OpenCode, AND Codex.*
 </critical-rules>
 
 ## Architecture
@@ -107,6 +115,8 @@ Cannot skip in /next-task:
 **REMEMBER**:
 - No summary files (`*_AUDIT.md`, `*_SUMMARY.md`) - use CHANGELOG.md
 - Multi-file changes → Read checklist FIRST (`checklists/*.md`)
+- After creating commands/agents/prompts → Run `/enhance` + check cross-platform compatibility
+- 3 platforms: Claude Code + OpenCode + Codex - ALL must work
 </end-reminder>
 
 ## Model Selection Guidelines
