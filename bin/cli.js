@@ -471,15 +471,25 @@ AI_STATE_DIR = ".codex"
 
   // Skill mappings: [skillName, plugin, sourceFile, description]
   // Codex skills require SKILL.md with name and description in YAML frontmatter
+  // IMPORTANT: Descriptions must include trigger phrases per Codex best practices
+  // Format: "Use when user asks to 'phrase1', 'phrase2'. Description of what it does."
   const skillMappings = [
-    ['enhance', 'enhance', 'enhance.md', 'Master enhancement orchestrator with parallel analyzer execution'],
-    ['next-task', 'next-task', 'next-task.md', 'Master workflow orchestrator with autonomous task-to-production automation'],
-    ['ship', 'ship', 'ship.md', 'Complete PR workflow from commit to production with validation'],
-    ['deslop-around', 'deslop-around', 'deslop-around.md', 'AI slop cleanup with minimal diffs and behavior preservation'],
-    ['project-review', 'project-review', 'project-review.md', 'Multi-agent iterative code review until zero issues remain'],
-    ['reality-check-scan', 'reality-check', 'scan.md', 'Deep repository analysis to detect plan drift and code reality gaps'],
-    ['delivery-approval', 'next-task', 'delivery-approval.md', 'Validate task completion and approve for shipping'],
-    ['update-docs-around', 'next-task', 'update-docs-around.md', 'Sync documentation with actual code state']
+    ['enhance', 'enhance', 'enhance.md',
+      'Use when user asks to "enhance prompts", "improve agents", "analyze plugins", "optimize documentation", "review CLAUDE.md". Runs 5 parallel analyzers on prompts, agents, plugins, docs, and project memory files.'],
+    ['next-task', 'next-task', 'next-task.md',
+      'Use when user asks to "find next task", "what should I work on", "automate workflow", "implement and ship", "run next-task". Orchestrates complete task-to-production workflow: discovery, implementation, review, and delivery.'],
+    ['ship', 'ship', 'ship.md',
+      'Use when user asks to "ship this", "create PR", "merge to main", "deploy changes", "push to production". Complete PR workflow: commit, create PR, monitor CI, merge, deploy, validate.'],
+    ['deslop-around', 'deslop-around', 'deslop-around.md',
+      'Use when user asks to "clean up slop", "remove AI artifacts", "deslop the codebase", "find debug statements", "remove console.logs", "repo hygiene". Detects and removes AI-generated slop patterns.'],
+    ['project-review', 'project-review', 'project-review.md',
+      'Use when user asks to "review my code", "check for issues", "run code review", "analyze PR quality". Multi-agent iterative review that loops until all critical/high issues are resolved.'],
+    ['reality-check-scan', 'reality-check', 'scan.md',
+      'Use when user asks to "check plan drift", "compare docs to code", "verify roadmap", "scan for reality gaps". Analyzes documentation vs actual code to detect drift and outdated plans.'],
+    ['delivery-approval', 'next-task', 'delivery-approval.md',
+      'Use when user asks to "validate delivery", "approve for shipping", "check if ready to ship", "verify task completion". Autonomous validation that tests pass, build succeeds, and requirements are met.'],
+    ['update-docs-around', 'next-task', 'update-docs-around.md',
+      'Use when user asks to "update docs", "sync documentation", "fix outdated docs", "refresh README". Compares documentation to actual code and fixes discrepancies.']
   ];
 
   for (const [skillName, plugin, sourceFile, description] of skillMappings) {
@@ -495,15 +505,18 @@ AI_STATE_DIR = ".codex"
       let content = fs.readFileSync(srcPath, 'utf8');
 
       // Check if file has existing YAML frontmatter
+      // Escape description for YAML: wrap in double quotes, escape internal quotes
+      const yamlDescription = `"${description.replace(/"/g, '\\"')}"`;
+
       if (content.startsWith('---')) {
         // Replace existing frontmatter with Codex-compatible format
         content = content.replace(
           /^---\n[\s\S]*?\n---\n/,
-          `---\nname: ${skillName}\ndescription: ${description}\n---\n`
+          `---\nname: ${skillName}\ndescription: ${yamlDescription}\n---\n`
         );
       } else {
         // Add new frontmatter
-        content = `---\nname: ${skillName}\ndescription: ${description}\n---\n\n${content}`;
+        content = `---\nname: ${skillName}\ndescription: ${yamlDescription}\n---\n\n${content}`;
       }
 
       // Transform CLAUDE_PLUGIN_ROOT -> PLUGIN_ROOT for Codex

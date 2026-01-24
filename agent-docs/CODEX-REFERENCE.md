@@ -179,13 +179,41 @@ Our `AskUserQuestion` format should work in Codex via the MCP server, but native
 ```yaml
 ---
 name: skill-name
-description: "Comprehensive description including when to use it"
+description: "Use when user asks to \"trigger phrase 1\", \"trigger phrase 2\". Description of what it does and key capabilities."
 ---
 
 # Skill Instructions
 
 Content and procedures...
 ```
+
+### Description Best Practices
+
+**Critical**: The description is the PRIMARY triggering mechanism. It must include:
+
+1. **Specific trigger phrases** - "Use when user asks to..."
+2. **What the skill does** - Brief explanation of capabilities
+3. **Proper YAML escaping** - Wrap in quotes, escape internal quotes
+
+**Good Example:**
+```yaml
+description: "Use when user asks to \"find next task\", \"what should I work on\", \"automate workflow\". Orchestrates complete task-to-production workflow."
+```
+
+**Bad Example:**
+```yaml
+description: Master workflow orchestrator  # No trigger phrases!
+```
+
+### Progressive Disclosure
+
+| Level | Content | Size |
+|-------|---------|------|
+| Metadata | name + description | ~100 words (always loaded) |
+| SKILL.md body | Core instructions | <500 lines (loaded on trigger) |
+| references/ | Detailed docs | Unlimited (loaded as needed) |
+
+**Note:** Some awesome-slash skills exceed 500 lines. Future improvement: split into references/.
 
 ### Invoking Skills
 
