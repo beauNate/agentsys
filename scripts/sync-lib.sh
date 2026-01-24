@@ -34,11 +34,13 @@ fi
 echo "Syncing lib/ to all plugins..."
 
 PLUGINS=(
-  "deslop-around"
+  "audit-project"
+  "deslop"
+  "drift-detect"
+  "enhance"
   "next-task"
-  "project-review"
   "ship"
-  "reality-check"
+  "sync-docs"
 )
 
 for plugin in "${PLUGINS[@]}"; do

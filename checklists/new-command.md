@@ -39,7 +39,14 @@ Describe expected output.
 - Keep description under 500 chars (token efficiency)
 - Use imperative instructions ("Do X", not "You should do X")
 - Include examples for complex operations
-- Reference lib modules: `${CLAUDE_PLUGIN_ROOT}/lib/...`
+- Reference lib modules with Windows-safe paths:
+  ```javascript
+  // ✓ CORRECT
+  const module = require('${CLAUDE_PLUGIN_ROOT}'.replace(/\\/g, '/') + '/lib/module.js');
+
+  // ✗ WRONG (breaks on Windows)
+  const module = require('${CLAUDE_PLUGIN_ROOT}/lib/module.js');
+  ```
 
 ## 2. Update Plugin Manifest
 

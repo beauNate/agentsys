@@ -32,6 +32,22 @@ $CLAUDE_PLUGIN_ROOT   → $PLUGIN_ROOT
 
 **Reason:** OpenCode and Codex use `PLUGIN_ROOT`, not `CLAUDE_PLUGIN_ROOT`.
 
+**⚠️ CRITICAL: Windows Path Handling in require() statements**
+
+When using `require()` with plugin paths, **ALWAYS** normalize Windows backslashes:
+
+```javascript
+// ✓ CORRECT - Works on all platforms (Windows, Linux, Mac)
+const module = require('${CLAUDE_PLUGIN_ROOT}'.replace(/\\/g, '/') + '/lib/module.js');
+
+// ✗ WRONG - Breaks on Windows (backslashes become escape sequences)
+const module = require('${CLAUDE_PLUGIN_ROOT}/lib/module.js');
+```
+
+**Why:** Windows paths like `C:\Users\...` have backslashes that JavaScript interprets as escape sequences (`\U` → `U`, etc.), breaking the path. Forward slashes work on all platforms including Windows.
+
+**Note:** The `.replace(/\\/g, '/')` normalization works with both `${CLAUDE_PLUGIN_ROOT}` and `${PLUGIN_ROOT}` after platform transformations.
+
 ### 2. State Directory
 
 **Never hardcode `.claude/`**. Use platform-aware paths:
