@@ -10,8 +10,8 @@ Build tools once, run everywhere. The core workflows are the same regardless of 
 |---------|---------|
 | [Supported Platforms](#supported-platforms) | Which platforms work |
 | [Claude Code](#claude-code-native) | Native plugin installation |
-| [OpenCode](#opencode) | MCP + agent setup |
-| [Codex CLI](#codex-cli) | Skills + MCP setup |
+| [OpenCode](#opencode) | Plugins/agents (MCP optional) |
+| [Codex CLI](#codex-cli) | Skills (MCP optional) |
 | [State Directories](#state-directories) | Where state files live |
 | [Troubleshooting](#troubleshooting) | Common issues |
 
@@ -22,8 +22,8 @@ Build tools once, run everywhere. The core workflows are the same regardless of 
 | Platform | Integration Method | Command Prefix | Status |
 |----------|-------------------|----------------|--------|
 | Claude Code | Native plugins | `/` (slash) | ✅ Full support |
-| OpenCode | MCP + Agent configs | `/` (slash) | ✅ Supported |
-| Codex CLI | MCP + Skills | `$` (dollar) | ✅ Supported |
+| OpenCode | Plugins + agent configs (MCP optional) | `/` (slash) | ✅ Supported |
+| Codex CLI | Skills (MCP optional) | `$` (dollar) | ✅ Supported |
 
 > **Note:** Codex CLI uses `$` prefix for skills (e.g., `$next-task`, `$ship`) instead of `/` slash commands.
 
@@ -31,10 +31,12 @@ Build tools once, run everywhere. The core workflows are the same regardless of 
 
 All three platforms share:
 
-1. **MCP (Model Context Protocol)** - Universal tool interface
+1. **MCP (Model Context Protocol)** - Optional tool interface for external clients
 2. **Agent/Subagent systems** - Specialized assistants with tool restrictions
 3. **Slash commands** - User-invoked actions
 4. **Configuration files** - JSON/YAML/Markdown formats
+
+> **MCP is optional.** If you're running awesome-slash as native plugins/skills (Claude Code, OpenCode, Codex CLI) or invoking scripts directly, you can skip MCP. Use MCP when you want a generic tool endpoint for external clients.
 
 ## Claude Code (Native)
 

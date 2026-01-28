@@ -3,6 +3,7 @@
 Complete reference for MCP (Model Context Protocol) tools exposed by awesome-slash.
 
 **TL;DR:** 9 tools that work on Claude Code, OpenCode, and Codex CLI. Same API, different state directories.
+**MCP is optional** when using native plugins/skills or running scripts directly.
 
 ---
 
@@ -31,10 +32,12 @@ Complete reference for MCP (Model Context Protocol) tools exposed by awesome-sla
 
 ## Overview
 
-The MCP server (`mcp-server/index.js`) exposes 9 tools that work across all supported platforms:
+The MCP server (`mcp-server/index.js`) exposes 9 tools that work across all supported platforms when an MCP client is configured:
 - Claude Code
 - OpenCode
 - Codex CLI
+
+If you're using native plugins/skills or calling scripts directly, you do not need MCP.
 
 ---
 
