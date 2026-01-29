@@ -14,7 +14,7 @@ AI models can write code. That's not the hard part anymore. The hard part is eve
 
 | Section | What's there |
 |---------|--------------|
-| [Commands](#commands) | All 8 commands with jump links |
+| [Commands](#commands) | All 9 commands with jump links |
 | [What This Does](#what-this-project-does) | The problem and how this solves it |
 | [What's Different](#what-makes-this-different) | Why this isn't just another AI tool |
 | [Design Philosophy](#design-philosophy) | The thinking behind the architecture |
@@ -36,6 +36,7 @@ AI models can write code. That's not the hard part anymore. The hard part is eve
 | [`/repo-map`](#repo-map) | Builds a cached AST repo map for fast analysis | [→](#repo-map) |
 | [`/enhance`](#enhance) | Analyzes prompts, plugins, docs for improvements | [→](#enhance) |
 | [`/sync-docs`](#sync-docs) | Syncs documentation with code changes | [→](#sync-docs) |
+| [`/perf`](#perf) | Runs structured performance investigations | [→](#perf) |
 
 ---
 
@@ -480,6 +481,30 @@ Tools like `/drift-detect` and planners can use the map instead of re-scanning t
 /enhance                    # Run all analyzers
 /enhance --focus=agent      # Just agent prompts
 /enhance --apply            # Apply HIGH certainty fixes
+```
+
+---
+
+### /perf
+
+**Purpose:** Run structured performance investigations with baselines, profiling, and evidence‑backed decisions.
+
+**Usage:**
+
+```bash
+/perf                 # Start new investigation
+/perf --resume        # Resume previous investigation
+```
+
+**Phase flags (advanced):**
+
+```bash
+/perf --phase baseline --command "npm run bench" --version v1.2.0
+/perf --phase breaking-point --command "npm run bench" --param-min 1 --param-max 500
+/perf --phase constraints --command "npm run bench" --cpu 1 --memory 1GB
+/perf --phase optimization --change "reduce allocations"
+/perf --phase decision --verdict stop --rationale "no measurable improvement"
+/perf --phase consolidation --version v1.2.0
 ```
 
 ---
