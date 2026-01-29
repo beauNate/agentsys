@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "id": "perf-20260129-171328-583b3dab",
+  "id": "perf-20260129-171545-979951d9",
   "status": "in_progress",
   "phase": "baseline",
-  "createdAt": "2026-01-29T17:13:28.346Z",
-  "updatedAt": "2026-01-29T17:13:28.349Z",
+  "createdAt": "2026-01-29T17:15:45.670Z",
+  "updatedAt": "2026-01-29T17:15:45.672Z",
   "scenario": {
-    "description": "perf",
+    "description": "perf tooling smoke test (release check)",
     "metrics": [],
     "successCriteria": "",
     "scenarios": []
@@ -22,7 +22,7 @@
   "profilingResults": [],
   "decision": null,
   "benchmark": {
-    "command": "node",
+    "command": "node -e \"setTimeout(()=>{console.log('PERF_METRICS_START'); console.log(JSON.stringify({latency_ms:1, throughput_rps:1})); console.log('PERF_METRICS_END');}, 60000)\"",
     "version": "tooling-smoke-2026-01-29"
   }
 }
