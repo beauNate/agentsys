@@ -17,6 +17,7 @@ AI models can write code. That's not the hard part anymore. The hard part is eve
 | [Commands](#commands) | All 9 commands with jump links |
 | [What This Does](#what-this-project-does) | The problem and how this solves it |
 | [What's Different](#what-makes-this-different) | Why this isn't just another AI tool |
+| [What's New](#whats-new-in-v340-rc1) | Latest release highlights |
 | [Design Philosophy](#design-philosophy) | The thinking behind the architecture |
 | [Command Details](#command-details) | Deep dive into each command |
 | [Installation](#installation) | Get started in 2 commands |
@@ -37,6 +38,14 @@ AI models can write code. That's not the hard part anymore. The hard part is eve
 | [`/enhance`](#enhance) | Analyzes prompts, plugins, agents, docs, hooks, skills | [→](#enhance) |
 | [`/sync-docs`](#sync-docs) | Syncs documentation with code changes | [→](#sync-docs) |
 | [`/perf`](#perf) | Runs structured performance investigations | [→](#perf) |
+
+---
+
+## What's New in v3.4.0-rc.1
+
+- **/perf workflow** for baseline-to-decision performance investigations
+- **Enhance hooks/skills analyzers** for safer, clearer agent/hook definitions
+- **Expanded docs** covering perf phases, requirements, and architecture links
 
 ---
 

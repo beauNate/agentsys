@@ -30,6 +30,7 @@ Add the marketplace and install plugins directly in Claude Code:
 /plugin install drift-detect@awesome-slash
 /plugin install repo-map@awesome-slash
 /plugin install enhance@awesome-slash
+/plugin install perf@awesome-slash
 /plugin install sync-docs@awesome-slash
 ```
 
@@ -121,6 +122,7 @@ You should see commands:
 - `/drift-detect` - Plan drift detection
 - `/repo-map` - AST repo map generation
 - `/enhance` - Enhancement analyzer suite
+- `/perf` - Performance investigation workflow
 - `/sync-docs` - Documentation sync
 
 ### OpenCode / Codex

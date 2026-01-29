@@ -7,13 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0-rc.1] - 2026-01-29
+
 ### Added
-- **/enhance Hooks Analyzer** - New hook checks for frontmatter completeness and basic safety cues
+- **/perf Plugin** - Structured performance investigations with baselines, profiling, hypotheses, and evidence-backed decisions
+- **/perf Command** - Phase-based workflow for baselining, breaking points, constraints, profiling, and consolidation
+- **/perf Skills & Agents** - Baseline, benchmark, profiling, theory testing, code paths, and investigation logging
+- **/enhance Hooks Analyzer** - New hook checks for frontmatter completeness and safety cues
 - **/enhance Skills Analyzer** - New SKILL.md checks for frontmatter and trigger phrase clarity
 - **Enhance MCP Tool** - `enhance_analyze` now supports `hooks` and `skills` focus targets
 
 ### Changed
 - **Enhance Orchestrator** - Expanded to run hooks/skills analyzers alongside existing enhancers
+- **Docs** - Expanded /perf usage, requirements, and architecture references
+
+### Fixed
+- **/perf Path Safety** - Validate investigation ids and baseline versions to prevent path traversal
+- **/perf Optimization Runner** - Explicit warm-up before experiment capture
 
 ## [3.3.2] - 2026-01-29
 
