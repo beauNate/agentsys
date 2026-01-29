@@ -42,6 +42,10 @@ describe('perf investigation state', () => {
     expect(contents).toContain('Entry 2');
   });
 
+  it('rejects invalid investigation ids', () => {
+    expect(() => investigationState.getInvestigationLogPath('../bad-id', tempDir)).toThrow();
+  });
+
   it('appends baseline log entries', () => {
     const state = investigationState.initializeInvestigation({
       scenarios: [

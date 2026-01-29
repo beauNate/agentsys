@@ -28,6 +28,10 @@ describe('perf baseline store', () => {
     expect(baseline.metrics.latency).toBe(120);
   });
 
+  it('rejects invalid baseline versions', () => {
+    expect(() => baselineStore.getBaselinePath('../v1.0.0', tempDir)).toThrow();
+  });
+
   it('compares baseline metrics', () => {
     const result = baselineComparator.compareBaselines(
       { metrics: { latency: 100 } },
