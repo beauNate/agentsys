@@ -13,14 +13,16 @@ grep -r '"version"' package.json .claude-plugin/ plugins/*/.claude-plugin/ mcp-s
 
 - [ ] `package.json` → `"version": "X.Y.Z"`
 - [ ] `.claude-plugin/plugin.json` → `"version": "X.Y.Z"`
-- [ ] `.claude-plugin/marketplace.json` → `"version"` (6 occurrences)
+- [ ] `.claude-plugin/marketplace.json` → `"version"` (9 occurrences)
 - [ ] `mcp-server/index.js` → `version: 'X.Y.Z'` (search: MCP_SERVER_VERSION)
-- [ ] `plugins/next-task/.claude-plugin/plugin.json`
-- [ ] `plugins/ship/.claude-plugin/plugin.json`
-- [ ] `plugins/deslop/.claude-plugin/plugin.json`
 - [ ] `plugins/audit-project/.claude-plugin/plugin.json`
+- [ ] `plugins/deslop/.claude-plugin/plugin.json`
 - [ ] `plugins/drift-detect/.claude-plugin/plugin.json`
 - [ ] `plugins/enhance/.claude-plugin/plugin.json`
+- [ ] `plugins/next-task/.claude-plugin/plugin.json`
+- [ ] `plugins/repo-map/.claude-plugin/plugin.json`
+- [ ] `plugins/ship/.claude-plugin/plugin.json`
+- [ ] `plugins/sync-docs/.claude-plugin/plugin.json`
 
 ## New Plugin Checklist
 

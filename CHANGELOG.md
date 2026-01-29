@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.3] - 2026-01-29
+
 ### Fixed
 - **Windows Path Template Substitution** - Fixed plugin path template substitution across 18 command/agent files
   - Replaced `'${CLAUDE_PLUGIN_ROOT}'.replace()` with runtime `process.env` access
