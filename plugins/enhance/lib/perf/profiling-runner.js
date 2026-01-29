@@ -22,17 +22,9 @@ function runProfiling(options = {}) {
     return { ok: false, error: 'No profiler available' };
   }
 
-  const command = profiler.buildCommand({
-    command: options.command,
-    output: options.output,
-    ...(options.profileOptions || {})
-  });
-  const env = {
-    ...process.env,
-    ...(options.env || {})
-  };
+  const command = profiler.buildCommand(options.profileOptions || {});
   try {
-    execSync(command, { stdio: 'pipe', env });
+    execSync(command, { stdio: 'pipe' });
   } catch (error) {
     return { ok: false, error: error.message };
   }

@@ -330,7 +330,7 @@ async function runPhase() {
       return;
     }
     case 'profiling': {
-      const result = profilingRunner.runProfiling({ repoPath: cwd, command });
+      const result = profilingRunner.runProfiling({ repoPath: cwd });
       if (!result.ok) {
         console.error(`Profiling failed: ${result.error}`);
         process.exit(1);
