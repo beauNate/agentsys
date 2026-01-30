@@ -35,10 +35,14 @@ const targetPath = args.find(a => !a.startsWith('--')) || '.';
 const applyFixes = args.includes('--apply');
 const focusType = args.find(a => a.startsWith('--focus='))?.split('=')[1];
 const verbose = args.includes('--verbose');
+const showSuppressed = args.includes('--show-suppressed');
+const resetLearned = args.includes('--reset-learned');
+const noLearn = args.includes('--no-learn');
+const exportLearned = args.includes('--export-learned');
 
 // --- Input Validation ---
 const VALID_FOCUS_TYPES = ['plugin', 'agent', 'claudemd', 'claude-memory', 'docs', 'prompt', 'hooks', 'skills'];
-const VALID_FLAGS = ['--apply', '--verbose', '--focus='];
+const VALID_FLAGS = ['--apply', '--verbose', '--focus=', '--show-suppressed', '--reset-learned', '--no-learn', '--export-learned'];
 
 // Validate focus type if provided
 if (focusType && !VALID_FOCUS_TYPES.includes(focusType)) {
@@ -57,6 +61,10 @@ if (unknownFlags.length > 0) {
 - `--apply` - Apply auto-fixes for HIGH certainty issues after report
 - `--focus=TYPE` - Run only specified enhancer(s): plugin, agent, claudemd/claude-memory, docs, prompt, hooks, skills
 - `--verbose` - Include LOW certainty issues in report
+- `--show-suppressed` - Show what's being filtered by auto-learned suppressions
+- `--reset-learned` - Clear auto-learned suppressions for this project
+- `--no-learn` - Disable auto-learning this run
+- `--export-learned` - Export suppressions for team sharing
 
 ## Enhancer Registry
 
@@ -100,6 +108,35 @@ if (!focus || focus === 'docs') enhancersToRun.push('docs');
 if (!focus || focus === 'prompt') enhancersToRun.push('prompt');
 if (!focus || focus === 'hooks') enhancersToRun.push('hooks');
 if (!focus || focus === 'skills') enhancersToRun.push('skills');
+
+// Load auto-learned suppressions
+const { getSuppressionPath } = require('@awesome-slash/lib/cross-platform');
+const { loadAutoSuppressions, getProjectId, clearAutoSuppressions, exportAutoSuppressions } = require('@awesome-slash/lib/enhance/auto-suppression');
+const { loadConfig } = require('@awesome-slash/lib/enhance/suppression');
+
+const suppressionPath = getSuppressionPath();
+const projectId = getProjectId(targetPath);
+
+// Handle --reset-learned flag
+if (resetLearned) {
+  clearAutoSuppressions(suppressionPath, projectId);
+  console.log(`Cleared auto-learned suppressions for project: ${projectId}`);
+}
+
+// Handle --export-learned flag
+if (exportLearned) {
+  const exported = exportAutoSuppressions(suppressionPath, projectId);
+  console.log(JSON.stringify(exported, null, 2));
+  return;
+}
+
+// Load existing suppressions
+const manualConfig = loadConfig(targetPath);
+const autoLearned = loadAutoSuppressions(suppressionPath, projectId);
+const suppressions = {
+  ...manualConfig,
+  auto_learned: autoLearned
+};
 ```
 
 ### Phase 2: Launch Enhancers in Parallel
@@ -273,6 +310,61 @@ Generate a markdown report with:
 });
 
 console.log(report);
+```
+
+### Phase 4.5: Auto-Learning (unless --no-learn)
+
+Analyze findings for false positives and save learned suppressions:
+
+```javascript
+if (!noLearn) {
+  const { analyzeForAutoSuppression, saveAutoSuppressions } = require('@awesome-slash/lib/enhance/auto-suppression');
+
+  // Build file contents map for context analysis
+  const fileContents = new Map();
+  for (const finding of aggregated.findings) {
+    if (finding.file && !fileContents.has(finding.file)) {
+      try {
+        const content = await Read({ file_path: finding.file });
+        fileContents.set(finding.file, content);
+      } catch {
+        // File may not exist or be readable
+      }
+    }
+  }
+
+  // Analyze for false positives
+  const newSuppressions = analyzeForAutoSuppression(
+    aggregated.findings,
+    fileContents,
+    { projectRoot: targetPath }
+  );
+
+  if (newSuppressions.length > 0) {
+    saveAutoSuppressions(suppressionPath, projectId, newSuppressions);
+    console.log(`\nLearned ${newSuppressions.length} new suppressions for future runs.`);
+
+    // Show details if --show-suppressed
+    if (showSuppressed) {
+      console.log('\n### Newly Learned Suppressions\n');
+      for (const s of newSuppressions) {
+        console.log(`- ${s.patternId} in ${s.file} (${(s.confidence * 100).toFixed(0)}% confidence)`);
+        console.log(`  Reason: ${s.suppressionReason}`);
+      }
+    }
+  }
+}
+
+// Show existing suppressions if --show-suppressed
+if (showSuppressed && autoLearned.patterns) {
+  const patternCount = Object.keys(autoLearned.patterns).length;
+  if (patternCount > 0) {
+    console.log(`\n### Previously Learned Suppressions (${patternCount} patterns)\n`);
+    for (const [patternId, data] of Object.entries(autoLearned.patterns)) {
+      console.log(`- ${patternId}: ${data.files?.length || 0} file(s), ${(data.confidence * 100).toFixed(0)}% confidence`);
+    }
+  }
+}
 ```
 
 ### Phase 5: Apply Fixes (if --apply)
