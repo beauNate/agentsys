@@ -104,7 +104,8 @@ describe('Suppression System', () => {
             vague_instructions: { files: ['docs.md'], confidence: 0.95, reason: 'Auto' }
           }
         },
-        ignore: { patterns: [], files: [], rules: {} }
+        ignore: { patterns: [], files: [], rules: {} },
+        severity: {}
       };
 
       const fileContents = new Map();
