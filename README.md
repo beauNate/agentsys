@@ -10,6 +10,7 @@ AI models can write code. That's not the hard part anymore. The hard part is eve
 
 **9 plugins · 39 agents · 23 skills · 22k lines of lib code · 1,400+ tests · 3 platforms**
 
+If you find this useful: [⭐ Star the repo](https://github.com/avifenesh/awesome-slash)
 ---
 
 ## What This Is
@@ -21,8 +22,6 @@ Install the plugins → get the skills → your agents become more capable. Each
 From messy project to clean codebase. From drifted plan to focused execution. From task to merged PR.
 
 **Works with:** Claude Code · OpenCode · Codex CLI
-
-If you find this useful: [⭐ Star the repo](https://github.com/avifenesh/awesome-slash)
 
 ---
 
