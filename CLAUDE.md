@@ -146,6 +146,7 @@ Command (orchestration) → Agent (thin wrapper) → Skill (implementation)
 ### Dev Commands
 ```bash
 npm test                     # Run tests (do before commits)
+npm run bump <version>       # Bump all version files (e.g., 3.7.3)
 ./scripts/sync-lib.sh        # Sync lib/ to plugins/
 npm pack                     # Build package
 awesome-slash                # Run installer
