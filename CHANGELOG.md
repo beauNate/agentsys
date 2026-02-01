@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.7.2-rc.4] - 2026-02-01
+
+### Fixed
+- **OpenCode Lib Files** - Copy lib/ directory to commands folder
+  - Commands can now require() lib modules (policy-questions, workflow-state, etc.)
+  - Added copyDirRecursive helper for recursive directory copy
+
 ## [3.7.2-rc.3] - 2026-02-01
 
 ### Fixed

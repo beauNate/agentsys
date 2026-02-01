@@ -51,6 +51,23 @@ function commandExists(cmd) {
 }
 
 /**
+ * Recursively copy a directory
+ */
+function copyDirRecursive(src, dest) {
+  fs.mkdirSync(dest, { recursive: true });
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      copyDirRecursive(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
+/**
  * Parse command line arguments
  */
 function parseArgs(args) {
@@ -552,6 +569,15 @@ function installForOpenCode(installDir, options = {}) {
     }
   }
   console.log(`  [OK] Installed ${agentCount} agents to ${agentsDir}`);
+
+  // Copy lib files to commands directory for require() access
+  const libSrcDir = path.join(installDir, 'lib');
+  const libDestDir = path.join(commandsDir, 'lib');
+  if (fs.existsSync(libSrcDir)) {
+    console.log('  Installing lib files...');
+    copyDirRecursive(libSrcDir, libDestDir);
+    console.log(`  [OK] Installed lib to ${libDestDir}`);
+  }
 
   console.log('[OK] OpenCode installation complete!');
   console.log(`   Commands: ${commandsDir}`);
