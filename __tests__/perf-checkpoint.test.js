@@ -13,12 +13,15 @@ describe('perf checkpoint', () => {
   });
 
   it('handles no-op commits gracefully', () => {
-    const childProcess = require('child_process');
-    const execSpy = jest.spyOn(childProcess, 'execFileSync').mockImplementation(() => {
-      throw new Error('not a git repo');
-    });
+    jest.resetModules();
+    jest.doMock('child_process', () => ({
+      execFileSync: jest.fn(() => {
+        throw new Error('not a git repo');
+      })
+    }));
 
-    const result = checkpoint.commitCheckpoint({
+    const freshCheckpoint = require('../lib/perf/checkpoint');
+    const result = freshCheckpoint.commitCheckpoint({
       phase: 'baseline',
       id: 'perf-123'
     });
@@ -29,7 +32,7 @@ describe('perf checkpoint', () => {
       expect(result.message).toContain('perf: phase baseline');
     }
 
-    execSpy.mockRestore();
+    jest.dontMock('child_process');
   });
 
   it('detects duplicate checkpoint messages', () => {

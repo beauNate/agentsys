@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.7.1] - 2026-02-01
+
+### Security
+- **Command Injection Prevention** - Converted `execSync` to `execFileSync` with argument arrays
+  - `lib/collectors/docs-patterns.js` - Added `isValidGitRef()` validation
+  - `lib/repo-map/updater.js` - Added `isValidCommitHash()` validation
+  - `lib/repo-map/installer.js` - Safe command execution with argument arrays
+  - `lib/enhance/auto-suppression.js` - Git remote command
+  - `lib/patterns/slop-analyzers.js` - Git log command
+  - `lib/perf/checkpoint.js` - Git status/log commands
+  - `lib/repo-map/runner.js` - Git rev-parse commands
+
 ### Removed
 - **MCP Server** - Removed unused MCP (Model Context Protocol) server component
   - Deleted `mcp-server/` directory
@@ -54,6 +66,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Test Coverage** - Expanded `lib/utils/atomic-write.js` tests to 41 (concurrency, unicode, large files)
 - **Test Coverage** - Expanded `lib/patterns/pipeline.js` tests to 72 (timeout, filtering, aggregation)
 - **Test Coverage** - Expanded `lib/collectors/docs-patterns.js` tests to 69 (edge cases, coverage)
+- **Test Coverage** - Added 72 tests for enhancement analyzers (plugin/agent patterns, severity classification)
+
+### Fixed
+- **Error Handling** - Added graceful degradation to platform detection and tool verification
+  - `lib/platform/verify-tools.js` - Try-catch with fallback to unavailable status
+  - `lib/platform/detect-platform.js` - Individual .catch() handlers with sensible defaults
+  - `lib/perf/benchmark-runner.js` - Meaningful error context for subprocess failures
+- **Async CLI** - Fixed `plugins/deslop/scripts/detect.js` to properly await async `runPipeline()`
 
 ## [3.7.0] - 2026-02-01
 
