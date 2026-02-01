@@ -130,35 +130,37 @@ describe('deslop consolidation', () => {
 
   describe('plugin.json consistency', () => {
     const pluginJsonPath = path.join(deslopDir, '.claude-plugin', 'plugin.json');
-    let pluginJson;
 
-    beforeAll(() => {
-      pluginJson = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf8'));
+    test('plugin.json is valid', () => {
+      const pluginJson = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf8'));
+      expect(pluginJson.name).toBe('deslop');
+      expect(pluginJson.version).toBeDefined();
+      // Note: agents/skills are auto-discovered from directories, not declared in plugin.json
     });
 
-    test('has exactly 1 agent', () => {
-      expect(pluginJson.agents.length).toBe(1);
+    test('has exactly 1 agent in filesystem', () => {
+      const agentsDir = path.join(deslopDir, 'agents');
+      const agents = fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'));
+      expect(agents.length).toBe(1);
+      expect(agents[0]).toBe('deslop-agent.md');
     });
 
-    test('has exactly 1 skill', () => {
-      expect(pluginJson.skills.length).toBe(1);
+    test('has exactly 1 skill in filesystem', () => {
+      const skillsDir = path.join(deslopDir, 'skills');
+      const skills = fs.readdirSync(skillsDir).filter(f =>
+        fs.statSync(path.join(skillsDir, f)).isDirectory()
+      );
+      expect(skills.length).toBe(1);
+      expect(skills[0]).toBe('deslop');
     });
 
-    test('references deslop-agent.md', () => {
-      expect(pluginJson.agents).toContain('agents/deslop-agent.md');
-    });
-
-    test('references deslop skill', () => {
-      expect(pluginJson.skills).toContain('skills/deslop/SKILL.md');
-    });
-
-    test('referenced agent exists', () => {
-      const agentPath = path.join(deslopDir, pluginJson.agents[0]);
+    test('agent file exists', () => {
+      const agentPath = path.join(deslopDir, 'agents', 'deslop-agent.md');
       expect(fs.existsSync(agentPath)).toBe(true);
     });
 
-    test('referenced skill exists', () => {
-      const skillPath = path.join(deslopDir, pluginJson.skills[0]);
+    test('skill file exists', () => {
+      const skillPath = path.join(deslopDir, 'skills', 'deslop', 'SKILL.md');
       expect(fs.existsSync(skillPath)).toBe(true);
     });
   });

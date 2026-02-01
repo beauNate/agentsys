@@ -22,16 +22,11 @@ describe('plugin structure', () => {
       expect(() => JSON.parse(content)).not.toThrow();
     });
 
-    test('plugin.json has agents array', () => {
+    test('plugin.json has required fields', () => {
       const pluginJson = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf8'));
-      expect(pluginJson.agents).toBeDefined();
-      expect(Array.isArray(pluginJson.agents)).toBe(true);
-    });
-
-    test('plugin.json has skills array', () => {
-      const pluginJson = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf8'));
-      expect(pluginJson.skills).toBeDefined();
-      expect(Array.isArray(pluginJson.skills)).toBe(true);
+      expect(pluginJson.name).toBe('deslop');
+      expect(pluginJson.version).toBeDefined();
+      // Note: agents/skills are auto-discovered from directories, not declared in plugin.json
     });
 
     test('has deslop-agent (unified agent)', () => {
@@ -63,13 +58,18 @@ describe('plugin structure', () => {
       expect(content.includes('description:')).toBe(true);
     });
 
-    test('plugin.json references unified agent and skill', () => {
-      const pluginJson = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf8'));
+    test('has exactly 1 agent and 1 skill in filesystem', () => {
+      const agentsDir = path.join(deslopDir, 'agents');
+      const agents = fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'));
+      expect(agents.length).toBe(1);
+      expect(agents[0]).toBe('deslop-agent.md');
 
-      expect(pluginJson.agents).toContain('agents/deslop-agent.md');
-      expect(pluginJson.skills).toContain('skills/deslop/SKILL.md');
-      expect(pluginJson.agents.length).toBe(1);
-      expect(pluginJson.skills.length).toBe(1);
+      const skillsDir = path.join(deslopDir, 'skills');
+      const skills = fs.readdirSync(skillsDir).filter(f =>
+        fs.statSync(path.join(skillsDir, f)).isDirectory()
+      );
+      expect(skills.length).toBe(1);
+      expect(skills[0]).toBe('deslop');
     });
   });
 
@@ -86,16 +86,11 @@ describe('plugin structure', () => {
       expect(() => JSON.parse(content)).not.toThrow();
     });
 
-    test('plugin.json has agents array', () => {
+    test('plugin.json has required fields', () => {
       const pluginJson = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf8'));
-      expect(pluginJson.agents).toBeDefined();
-      expect(Array.isArray(pluginJson.agents)).toBe(true);
-    });
-
-    test('plugin.json has skills array', () => {
-      const pluginJson = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf8'));
-      expect(pluginJson.skills).toBeDefined();
-      expect(Array.isArray(pluginJson.skills)).toBe(true);
+      expect(pluginJson.name).toBe('sync-docs');
+      expect(pluginJson.version).toBeDefined();
+      // Note: agents/skills are auto-discovered from directories, not declared in plugin.json
     });
 
     test('has sync-docs-agent (unified agent)', () => {
@@ -126,13 +121,18 @@ describe('plugin structure', () => {
       expect(content.includes('description:')).toBe(true);
     });
 
-    test('plugin.json references unified agent and skill', () => {
-      const pluginJson = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf8'));
+    test('has exactly 1 agent and 1 skill in filesystem', () => {
+      const agentsDir = path.join(syncDocsDir, 'agents');
+      const agents = fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'));
+      expect(agents.length).toBe(1);
+      expect(agents[0]).toBe('sync-docs-agent.md');
 
-      expect(pluginJson.agents).toContain('agents/sync-docs-agent.md');
-      expect(pluginJson.skills).toContain('skills/sync-docs/SKILL.md');
-      expect(pluginJson.agents.length).toBe(1);
-      expect(pluginJson.skills.length).toBe(1);
+      const skillsDir = path.join(syncDocsDir, 'skills');
+      const skills = fs.readdirSync(skillsDir).filter(f =>
+        fs.statSync(path.join(skillsDir, f)).isDirectory()
+      );
+      expect(skills.length).toBe(1);
+      expect(skills[0]).toBe('sync-docs');
     });
   });
 

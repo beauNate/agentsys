@@ -116,24 +116,18 @@ describe('consolidation counts verification', () => {
   });
 
   describe('plugin.json consistency', () => {
-    test('sync-docs plugin.json matches filesystem', () => {
+    test('sync-docs plugin.json is valid', () => {
       const pluginJson = JSON.parse(fs.readFileSync(
         path.join(pluginsDir, 'sync-docs', '.claude-plugin', 'plugin.json'), 'utf8'
       ));
 
-      expect(pluginJson.agents.length).toBe(1);
-      expect(pluginJson.skills.length).toBe(1);
+      expect(pluginJson.name).toBe('sync-docs');
+      expect(pluginJson.version).toBeDefined();
+      // Note: agents/skills are auto-discovered from directories, not declared in plugin.json
 
-      // Verify referenced files exist
-      pluginJson.agents.forEach(agent => {
-        const agentPath = path.join(pluginsDir, 'sync-docs', agent);
-        expect(fs.existsSync(agentPath)).toBe(true);
-      });
-
-      pluginJson.skills.forEach(skill => {
-        const skillPath = path.join(pluginsDir, 'sync-docs', skill);
-        expect(fs.existsSync(skillPath)).toBe(true);
-      });
+      // Verify filesystem has expected structure
+      expect(fs.existsSync(path.join(pluginsDir, 'sync-docs', 'agents', 'sync-docs-agent.md'))).toBe(true);
+      expect(fs.existsSync(path.join(pluginsDir, 'sync-docs', 'skills', 'sync-docs', 'SKILL.md'))).toBe(true);
     });
   });
 

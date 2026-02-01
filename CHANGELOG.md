@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.7.0-rc.2] - 2026-02-01
+
+### Fixed
+- **Plugin Install Failure** - Removed invalid `agents` and `skills` fields from deslop and sync-docs plugin.json manifests that caused schema validation errors
+
 ## [3.7.0-rc.1] - 2026-02-01
 
 ### Added

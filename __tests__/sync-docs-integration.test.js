@@ -21,12 +21,13 @@ describe('sync-docs integration', () => {
       expect(skills[0]).toBe('sync-docs');
     });
 
-    test('plugin.json matches filesystem', () => {
+    test('plugin.json is valid', () => {
       const pluginJson = JSON.parse(fs.readFileSync(
         path.join(pluginDir, '.claude-plugin', 'plugin.json'), 'utf8'
       ));
-      expect(pluginJson.agents.length).toBe(1);
-      expect(pluginJson.skills.length).toBe(1);
+      expect(pluginJson.name).toBe('sync-docs');
+      expect(pluginJson.version).toBeDefined();
+      // Note: agents/skills are auto-discovered from directories, not declared in plugin.json
     });
   });
 
