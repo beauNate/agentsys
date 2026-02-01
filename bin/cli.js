@@ -394,47 +394,91 @@ function installForOpenCode(installDir, options = {}) {
     content = content.replace(/`(next-task|deslop|enhance|ship|sync-docs|audit-project|drift-detect|repo-map|perf):([a-z-]+)`/g, '`$2`');
     content = content.replace(/(next-task|deslop|enhance|ship|sync-docs|audit-project|drift-detect|repo-map|perf):([a-z-]+)/g, '$2');
 
-    // Transform JavaScript code blocks to OpenCode instructions
-    // OpenCode commands don't execute JS - they're instruction files
+    // Transform ALL code blocks (with OR without language identifier)
+    // Pattern matches: ```javascript, ```js, ```bash, or just ``` (unmarked)
     content = content.replace(
-      /```javascript\n([\s\S]*?)```/g,
-      (match, code) => {
-        // Extract key actions from the code
-        let instructions = '**OpenCode Instructions:**\n';
+      /```(\w*)\n([\s\S]*?)```/g,
+      (match, lang, code) => {
+        const langLower = (lang || '').toLowerCase();
 
-        // Extract Task calls and convert to @ mentions (strip plugin prefix)
-        const taskMatches = code.matchAll(/(?:await\s+)?Task\s*\(\s*\{[^}]*subagent_type:\s*["'](?:[^"':]+:)?([^"']+)["'][^}]*\}\s*\)/g);
-        for (const taskMatch of taskMatches) {
-          const agent = taskMatch[1];
-          instructions += `- Invoke \`@${agent}\` agent\n`;
-        }
-
-        // Extract workflowState calls as status notes
-        if (code.includes('workflowState.startPhase')) {
-          const phaseMatch = code.match(/startPhase\s*\(\s*['"]([^'"]+)['"]\s*\)/);
-          if (phaseMatch) {
-            instructions += `- Phase: ${phaseMatch[1]}\n`;
+        // Keep bash/shell commands as-is (but remove node -e with require)
+        if (langLower === 'bash' || langLower === 'shell' || langLower === 'sh') {
+          // Remove node -e commands that contain require (these won't work)
+          if (code.includes('node -e') && code.includes('require(')) {
+            return '*(Bash command with Node.js require - adapt for OpenCode)*';
           }
+          return match;
         }
 
-        // Extract AskUserQuestion
-        if (code.includes('AskUserQuestion')) {
-          instructions += '- Ask user for input using question prompts\n';
+        // If it's explicitly marked as bash via content, keep it
+        if (!lang && (code.trim().startsWith('gh ') || code.trim().startsWith('glab ') ||
+            code.trim().startsWith('git ') || code.trim().startsWith('#!'))) {
+          return match;
         }
 
-        // Extract EnterPlanMode
-        if (code.includes('EnterPlanMode')) {
-          instructions += '- Enter plan mode for user approval\n';
+        // If it contains JS patterns, transform it
+        if (code.includes('require(') || code.includes('Task(') ||
+            code.includes('const ') || code.includes('let ') ||
+            code.includes('function ') || code.includes('=>') ||
+            code.includes('async ') || code.includes('await ')) {
+
+          // Extract key actions from the code
+          let instructions = '';
+
+          // Extract Task calls and convert to @ mentions
+          const taskMatches = [...code.matchAll(/(?:await\s+)?Task\s*\(\s*\{[^}]*subagent_type:\s*["'](?:[^"':]+:)?([^"']+)["'][^}]*\}\s*\)/gs)];
+          for (const taskMatch of taskMatches) {
+            const agent = taskMatch[1];
+            instructions += `- Invoke \`@${agent}\` agent\n`;
+          }
+
+          // Extract workflowState.startPhase
+          const phaseMatches = code.match(/startPhase\s*\(\s*['"]([^'"]+)['"]\s*\)/g);
+          if (phaseMatches) {
+            for (const pm of phaseMatches) {
+              const phase = pm.match(/['"]([^'"]+)['"]/)[1];
+              instructions += `- Phase: ${phase}\n`;
+            }
+          }
+
+          // Extract AskUserQuestion
+          if (code.includes('AskUserQuestion')) {
+            instructions += '- Use AskUserQuestion tool for user input\n';
+          }
+
+          // Extract EnterPlanMode
+          if (code.includes('EnterPlanMode')) {
+            instructions += '- Use EnterPlanMode for user approval\n';
+          }
+
+          // If we extracted something useful, return instructions
+          if (instructions) {
+            return instructions;
+          }
+
+          // Otherwise mark as reference only
+          return '*(JavaScript reference - not executable in OpenCode)*';
         }
 
-        // If no specific instructions extracted, keep as reference
-        if (instructions === '**OpenCode Instructions:**\n') {
-          return '```\n' + code + '```\n*(Reference - adapt for OpenCode)*';
-        }
-
-        return instructions;
+        return match;
       }
     );
+
+    // Remove the "*(Reference - adapt for OpenCode)*" markers since we've transformed the code
+    content = content.replace(/\*\(Reference - adapt for OpenCode\)\*/g, '');
+
+    // Remove any remaining standalone Task() calls outside code blocks
+    content = content.replace(/await\s+Task\s*\(\s*\{[\s\S]*?\}\s*\);?/g, (match) => {
+      const agentMatch = match.match(/subagent_type:\s*["'](?:[^"':]+:)?([^"']+)["']/);
+      if (agentMatch) {
+        return `Invoke \`@${agentMatch[1]}\` agent`;
+      }
+      return '*(Task call - use @agent-name syntax)*';
+    });
+
+    // Remove any remaining require() statements
+    content = content.replace(/(?:const|let|var)\s+\{?[^}=\n]+\}?\s*=\s*require\s*\([^)]+\);?/g, '');
+    content = content.replace(/require\s*\(['"][^'"]+['"]\)/g, '');
 
     // Add OpenCode-specific note at the top if it's a complex command
     if (content.includes('agent')) {
