@@ -489,7 +489,8 @@ function installForOpenCode(installDir, options = {}) {
     }
 
     // Embed policy options directly for OpenCode (can't require() external files)
-    if (content.includes('policy') || content.includes('Phase 1')) {
+    // Only add to next-task command (check for unique next-task markers)
+    if (content.includes('Master Workflow Orchestrator') && content.includes('No Shortcuts Policy')) {
       const policySection = `
 ## Phase 1: Policy Selection (Built-in Options)
 
