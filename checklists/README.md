@@ -16,6 +16,7 @@ Action-specific checklists to ensure consistency across the codebase.
 | [release.md](./release.md) | Preparing a new version release |
 | [new-command.md](./new-command.md) | Adding a new slash command |
 | [new-agent.md](./new-agent.md) | Adding a new specialist agent |
+| [new-skill.md](./new-skill.md) | Adding a new skill (Agent Skills Open Standard) |
 | [new-lib-module.md](./new-lib-module.md) | Adding a new library module |
 | [update-opencode-plugin.md](./update-opencode-plugin.md) | Updating native OpenCode plugin |
 | [repo-map.md](./repo-map.md) | Repo-map plugin changes |
@@ -48,4 +49,5 @@ Quick reference for which files need updating:
 | **Release** | package.json, CHANGELOG.md, README.md, all plugin.json files |
 | **New Command** | plugin commands/, plugin.json, ARCHITECTURE.md, bin/cli.js |
 | **New Agent** | plugin agents/, workflow.md, next-task.md |
+| **New Skill** | plugin skills/{skill-name}/SKILL.md, agent tools if agent-invoked |
 | **New Lib Module** | lib/, lib/index.js, sync to plugins/, tests |

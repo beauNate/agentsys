@@ -1,6 +1,6 @@
 {
   "name": "awesome-slash",
-  "version": "3.9.0-rc.4",
+  "version": "3.9.0-rc.5",
   "description": "9 specialized plugins for AI workflow automation (drift detection + AST repo maps) - works with Claude Code, OpenCode, and Codex CLI",
   "main": "lib/platform/detect-platform.js",
   "type": "commonjs",
@@ -11,8 +11,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "validate": "npm run validate:plugins && npm run validate:cross-platform && npm run validate:consistency && npm run validate:paths && npm run validate:counts && npm run validate:platform-docs",
+    "validate": "npm run validate:plugins && npm run validate:cross-platform && npm run validate:consistency && npm run validate:paths && npm run validate:counts && npm run validate:platform-docs && npm run validate:agent-skill-compliance",
     "validate:plugins": "node scripts/validate-plugins.js",
+    "validate:agent-skill-compliance": "node scripts/validate-agent-skill-compliance.js",
     "validate:cross-platform": "node scripts/validate-cross-platform.js",
     "validate:consistency": "node scripts/validate-repo-consistency.js",
     "validate:paths": "node scripts/check-hardcoded-paths.js",

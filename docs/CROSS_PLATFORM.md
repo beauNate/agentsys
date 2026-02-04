@@ -89,7 +89,7 @@ claude --plugin-dir /path/to/awesome-slash/plugins/next-task
 - `/enhance` - Enhancement analyzer suite
 - `/sync-docs` - Documentation sync
 
-### Available Agents (39 total: 29 file-based + 10 role-based)
+### Available Agents (39 total: 29 file-based agents + 10 role-based)
 
 **Key agents shown below:**
 
@@ -114,15 +114,15 @@ claude --plugin-dir /path/to/awesome-slash/plugins/next-task
 
 | Agent | Model | Purpose |
 |-------|-------|---------|
-| enhancement-orchestrator | opus | Coordinate all analyzers |
 | plugin-enhancer | sonnet | Analyze plugin structures |
 | agent-enhancer | opus | Review agent prompts |
-| docs-enhancer | sonnet | Documentation quality |
-| claudemd-enhancer | sonnet | Project memory optimization |
+| docs-enhancer | opus | Documentation quality |
+| claudemd-enhancer | opus | Project memory optimization |
 | prompt-enhancer | opus | General prompt quality |
 | hooks-enhancer | sonnet | Hook frontmatter and safety |
 | skills-enhancer | sonnet | SKILL.md structure and triggers |
 | enhancement-reporter | sonnet | Format unified reports |
+| cross-file-enhancer | sonnet | Cross-file consistency |
 
 **perf: Performance Investigation (6 agents)**
 

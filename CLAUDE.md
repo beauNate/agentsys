@@ -27,6 +27,7 @@
    - Release → `checklists/release.md`
    - New command → `checklists/new-command.md`
    - New agent → `checklists/new-agent.md`
+   - New skill → `checklists/new-skill.md`
    - New lib module → `checklists/new-lib-module.md`
    - OpenCode plugin update → `checklists/update-opencode-plugin.md`
    - Repo map changes → `checklists/repo-map.md`
@@ -65,7 +66,7 @@
 lib/          → Shared library (canonical source)
 plugins/      → 9 plugins, 39 agents (29 file-based + 10 role-based), 25 skills
 adapters/     → Platform adapters (opencode-plugin/, opencode/, codex/)
-checklists/   → Action checklists (8 files)
+checklists/   → Action checklists (9 files)
 bin/cli.js    → npm CLI installer
 ```
 

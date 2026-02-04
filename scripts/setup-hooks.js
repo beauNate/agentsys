@@ -25,10 +25,11 @@ fi
 
 const prePushHook = `#!/bin/sh
 # Pre-push validations:
-# 1. Run all validation checks (counts, paths, cross-platform docs)
-# 2. Warn if agents/skills/hooks/prompts modified (run /enhance)
-# 3. Block version tag pushes until release checklist passes
-# See: CLAUDE.md Critical Rule #7, checklists/release.md
+# 1. Run all validation checks (counts, paths, cross-platform docs, agent-skill compliance)
+# 2. Run agent-skill compliance check if agents/skills modified
+# 3. Warn if agents/skills/hooks/prompts modified (run /enhance)
+# 4. Block version tag pushes until release checklist passes
+# See: CLAUDE.md Critical Rule #7, checklists/release.md, checklists/new-skill.md
 
 echo ""
 echo "=============================================="
@@ -36,8 +37,16 @@ echo "  Pre-Push Validation"
 echo "=============================================="
 echo ""
 
+# Check for modified agents/skills first (we'll use this info twice)
+modified_files=$(git diff --name-only origin/\$(git remote show origin | grep "HEAD branch" | cut -d' ' -f5)..HEAD 2>/dev/null || git diff --name-only HEAD~1..HEAD)
+
+agents_modified=$(echo "$modified_files" | grep -E "agents/.*\\.md$" || true)
+skills_modified=$(echo "$modified_files" | grep -E "skills/.*/SKILL\\.md$" || true)
+hooks_modified=$(echo "$modified_files" | grep -E "hooks/.*\\.md$" || true)
+prompts_modified=$(echo "$modified_files" | grep -E "prompts/.*\\.md$" || true)
+
 # Run validation suite
-echo "[1/3] Running validation checks..."
+echo "[1/4] Running validation checks..."
 if ! npm run validate --silent 2>&1 | grep -E "\\[OK\\]|\\[ERROR\\]"; then
   echo ""
   echo "[ERROR] BLOCKED: Validation failed"
@@ -48,15 +57,25 @@ fi
 echo "[OK] Validation passed"
 echo ""
 
+# Run agent-skill compliance if agents or skills were modified
+echo "[2/4] Checking agent-skill compliance..."
+if [ -n "$agents_modified" ] || [ -n "$skills_modified" ]; then
+  echo "     Agent/skill files modified - running compliance check..."
+  if ! node scripts/validate-agent-skill-compliance.js 2>&1 | grep -E "\\[OK\\]|\\[ERROR\\]"; then
+    echo ""
+    echo "[ERROR] BLOCKED: Agent-skill compliance failed"
+    echo "   See: checklists/new-skill.md"
+    echo "   Fix: Ensure agents invoking skills have Skill tool"
+    echo "   Fix: Ensure skill directory names match skill names"
+    exit 1
+  fi
+else
+  echo "[OK] No agent/skill files modified"
+fi
+echo ""
+
 # Check for modified agents/skills/hooks/prompts
-echo "[2/3] Checking for enhanced content modifications..."
-modified_files=$(git diff --name-only origin/\$(git remote show origin | grep "HEAD branch" | cut -d' ' -f5)..HEAD 2>/dev/null || git diff --name-only HEAD~1..HEAD)
-
-agents_modified=$(echo "$modified_files" | grep -E "agents/.*\\.md$" || true)
-skills_modified=$(echo "$modified_files" | grep -E "skills/.*/SKILL\\.md$" || true)
-hooks_modified=$(echo "$modified_files" | grep -E "hooks/.*\\.md$" || true)
-prompts_modified=$(echo "$modified_files" | grep -E "prompts/.*\\.md$" || true)
-
+echo "[3/4] Checking for enhanced content modifications..."
 if [ -n "$agents_modified" ] || [ -n "$skills_modified" ] || [ -n "$hooks_modified" ] || [ -n "$prompts_modified" ]; then
   echo ""
   echo "CLAUDE.md Critical Rule #7 requires running /enhance"
@@ -89,7 +108,7 @@ fi
 echo ""
 
 # Check if pushing a version tag (v*)
-echo "[3/3] Checking for version tag..."
+echo "[4/4] Checking for version tag..."
 pushing_tag=false
 while read local_ref local_sha remote_ref remote_sha; do
   if echo "$local_ref" | grep -q "^refs/tags/v"; then
