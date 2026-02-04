@@ -2,8 +2,8 @@
 
 ## CRITICAL Rules
 
-You MUST ALWAYS follow these rules!!!
+You ABSOLUTELY MUST follow these rules!!!
 
-NEVER ignore IMPORTANT instructions!!
+NEVER ignore EXTREMELY IMPORTANT instructions!!!
 
-This is ABSOLUTELY CRITICAL!!
+This is TOTALLY CRITICAL!!!

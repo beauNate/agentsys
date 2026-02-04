@@ -172,13 +172,11 @@ describe('Prompt Patterns', () => {
       expect(result).toBeNull();
     });
 
-    it('should detect multiple exclamation marks', () => {
+    it('should detect excessive exclamation marks', () => {
       const content = `
-        This is important!!
-        Don't forget!!
-        Critical rule!!
-        Warning!!
-        Must follow!!
+        This is important!!!
+        Don't forget!!!
+        Critical rule!!!
       `;
 
       const result = pattern.check(content);

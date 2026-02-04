@@ -481,13 +481,11 @@ describe('Prompt Analyzer - False Negative Prevention', () => {
         expect(result.issue).toContain('aggressive');
       });
 
-      it('MUST flag multiple exclamation marks', () => {
+      it('MUST flag excessive exclamation marks', () => {
         const content = `
-          Important!!
-          Critical!!
-          Warning!!
-          Note!!
-          Must follow!!
+          Important!!!
+          Critical!!!
+          Warning!!!
         `;
         const result = pattern.check(content);
         expect(result).toBeTruthy();
