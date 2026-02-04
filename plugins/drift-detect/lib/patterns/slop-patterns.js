@@ -276,6 +276,24 @@ const slopPatterns = {
   },
 
   /**
+   * Rust: Bare .unwrap() calls without error context
+   * Can cause panics in production - prefer:
+   * - .unwrap_or(default) / .unwrap_or_else(|| ...)
+   * - .unwrap_or_default()
+   * - .expect("descriptive message")
+   * - ? operator for propagation
+   * - .ok() / .map() / .and_then() for transformation
+   */
+  rust_bare_unwrap: {
+    pattern: /\.unwrap\(\s*\)(?!\s*\.)/,
+    exclude: ['*_test.rs', '*_tests.rs', '**/tests/**', '**/examples/**', '**/benches/**'],
+    severity: 'medium',
+    autoFix: 'flag',
+    language: 'rust',
+    description: 'Bare .unwrap() can panic - use .expect(), .unwrap_or(), or ? operator'
+  },
+
+  /**
    * Python: raise NotImplementedError
    */
   placeholder_not_implemented_py: {

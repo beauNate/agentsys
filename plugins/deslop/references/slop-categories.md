@@ -14,6 +14,21 @@ Detailed reference for all slop patterns detected by the pipeline.
 
 **Excludes**: Test files, CLI entry points, config files
 
+### Unsafe Error Handling (Rust)
+
+| Pattern | Severity | Better Alternatives |
+|---------|----------|---------------------|
+| `.unwrap()` | medium | `.expect("msg")`, `.unwrap_or(default)`, `?` operator |
+
+Bare `.unwrap()` calls can cause panics in production. Prefer:
+- `.expect("descriptive message")` - panic with context
+- `.unwrap_or(default)` / `.unwrap_or_default()` - provide fallback
+- `.unwrap_or_else(\|\| ...)` - lazy fallback computation
+- `?` operator - propagate errors to caller
+- `.ok()` / `.map()` / `.and_then()` - transform Result/Option
+
+**Excludes**: Test files, examples, benchmarks
+
 ### Placeholder Code
 
 | Pattern | Language | Severity |
