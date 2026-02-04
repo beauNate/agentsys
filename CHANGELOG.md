@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.9.0-rc.2] - 2026-02-04
+
+### Added
+- **Cross-File Enhancer Integration** - Cross-file analyzer now runs as part of /enhance
+  - New `cross-file-enhancer` agent (sonnet model)
+  - New `enhance-cross-file` skill with 8 detection patterns
+  - Orchestrator updated to run cross-file analysis in parallel with other enhancers
+  - Focus flag: `--focus=cross-file` to run only cross-file analysis
+
+### Fixed
+- **AGENTS.md Model Consistency** - Fixed hooks-enhancer and skills-enhancer model (sonnet->opus)
+- **Documentation Counts** - Updated to 40 agents, 25 skills
+
 ## [3.9.0-rc.1] - 2026-02-04
 
 ### Added
