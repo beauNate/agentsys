@@ -65,6 +65,10 @@ awesome-slash/
 │   └── repo-map/        # AST repo mapping
 ├── bin/                          # CLI installer
 │   └── cli.js                    # Interactive installer
+├── meta/
+│   └── skills/
+│       └── maintain-cross-platform/  # Cross-platform compatibility skill
+│           └── SKILL.md
 ├── scripts/
 │   ├── setup-hooks.js            # Git hooks installer (npm prepare)
 │   └── sync-lib.sh               # Dev: sync lib/ to plugins/
