@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.9.0-rc.6] - 2026-02-04
+
+### Added
+- **Agent Skills Open Standard Compliance** - Automated validation for skill/agent structure
+  - New `checklists/new-skill.md` documenting Agent Skills Open Standard requirements
+  - New `validate:agent-skill-compliance` script added to CI pipeline
+  - 106 new tests in `agent-skill-compliance.test.js`
+  - Pre-push hook now validates compliance when agents/skills are modified
+
+### Fixed
+- **Skill Directory Names** - Renamed 21 skill directories to match their skill names per Agent Skills Open Standard
+  - PERF plugin: 9 directories (e.g., `analyzer` -> `perf-analyzer`)
+  - ENHANCE plugin: 10 directories (e.g., `prompts` -> `enhance-prompts`)
+  - NEXT-TASK plugin: 2 directories (`task-discovery` -> `discover-tasks`, `delivery-validation` -> `validate-delivery`)
+- **Missing Skill Tool** - Added `Skill` tool to 7 agents that invoke skills
+  - next-task: delivery-validator, task-discoverer
+  - perf: perf-analyzer, perf-code-paths, perf-investigation-logger, perf-theory-gatherer, perf-theory-tester
+
 ## [3.9.0-rc.2] - 2026-02-04
 
 ### Added
