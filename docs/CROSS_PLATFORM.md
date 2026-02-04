@@ -89,7 +89,7 @@ claude --plugin-dir /path/to/awesome-slash/plugins/next-task
 - `/enhance` - Enhancement analyzer suite
 - `/sync-docs` - Documentation sync
 
-### Available Agents (39 total: 29 file-based + 10 role-based)
+### Available Agents (40 total: 30 file-based + 10 role-based)
 
 **Key agents shown below:**
 
@@ -324,8 +324,8 @@ The plugin auto-detects the platform and uses the appropriate directory. Overrid
 - Works with any model provider (Claude, OpenAI, Google, local)
 - State directory: `.opencode/`
 - Slash commands in `~/.config/opencode/commands/`
-- Agents in `~/.config/opencode/agents/` (29 agents)
-- Skills in `~/.config/opencode/skills/` (24 skills)
+- Agents in `~/.config/opencode/agents/` (30 agents)
+- Skills in `~/.config/opencode/skills/` (25 skills)
 - Native plugin in `~/.config/opencode/plugins/awesome-slash.ts`
 - **Native plugin features:**
   - Auto-thinking selection (adjusts budget per agent)
