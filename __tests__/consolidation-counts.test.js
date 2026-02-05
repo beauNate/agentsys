@@ -5,11 +5,11 @@ describe('consolidation counts verification', () => {
   const pluginsDir = path.join(__dirname, '..', 'plugins');
 
   describe('total counts', () => {
-    test('has exactly 9 plugins', () => {
+    test('has exactly 10 plugins', () => {
       const plugins = fs.readdirSync(pluginsDir).filter(f =>
         fs.statSync(path.join(pluginsDir, f)).isDirectory()
       );
-      expect(plugins.length).toBe(9);
+      expect(plugins.length).toBe(10);
     });
 
     test('has exactly 29 file-based agents', () => {
@@ -188,14 +188,15 @@ describe('consolidation counts verification', () => {
   describe('per-plugin breakdown', () => {
     const expectedCounts = {
       'next-task': { agents: 10, skills: 3 },
-      'enhance': { agents: 9, skills: 10 },
+      'enhance': { agents: 8, skills: 9 },
       'ship': { agents: 0, skills: 0 },
       'perf': { agents: 6, skills: 8 },
       'audit-project': { agents: 0, skills: 0 },
       'deslop': { agents: 1, skills: 1 },
       'drift-detect': { agents: 1, skills: 1 },
       'repo-map': { agents: 1, skills: 1 },
-      'sync-docs': { agents: 1, skills: 1 }
+      'sync-docs': { agents: 1, skills: 1 },
+      'learn': { agents: 1, skills: 1 }
     };
 
     Object.entries(expectedCounts).forEach(([plugin, counts]) => {
