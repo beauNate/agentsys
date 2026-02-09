@@ -6,7 +6,7 @@ const path = require('path');
 const ROOT_DIR = path.join(__dirname, '..');
 const PLUGINS_DIR = path.join(ROOT_DIR, 'plugins');
 
-const errors = [];
+let errors = [];
 const PLUGINS_ROOT = path.resolve(PLUGINS_DIR);
 
 function escapeRegExp(value) {
@@ -426,6 +426,9 @@ function validateEnhanceAgentSkillUsage() {
 }
 
 function main() {
+  // Reset errors for each invocation (prevents state leakage across requires)
+  errors = [];
+
   console.log('Repository Consistency Validator');
   console.log('===============================\n');
 
@@ -439,10 +442,16 @@ function main() {
   if (errors.length > 0) {
     console.log('[ERROR] Consistency checks failed:\n');
     errors.forEach(error => console.log(`- ${error}`));
-    process.exit(1);
+    return 1;
   }
 
   console.log('[OK] Repository consistency checks passed');
+  return 0;
 }
 
-main();
+if (require.main === module) {
+  const code = main();
+  if (typeof code === 'number') process.exit(code);
+}
+
+module.exports = { main };
