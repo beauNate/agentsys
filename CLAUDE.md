@@ -61,6 +61,11 @@
    - Correct: `argument-hint: "[path] [--fix] [--target [target]]"`
    - Wrong: `argument-hint: "[path] [--fix] [--target <target>]"`
    *WHY: Consistent with Claude Code conventions. Angle brackets are ambiguous.*
+
+12. **Fix all test failures** - NEVER skip or ignore a failing test because it's "out of scope" or "pre-existing". Always fix it.
+   - If a test fails during your work, fix it before proceeding
+   - No test is someone else's problem
+   *WHY: Skipping failures erodes test trust. Every green run must mean everything works.*
 </critical-rules>
 
 <architecture>

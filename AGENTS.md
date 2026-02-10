@@ -56,6 +56,11 @@
    - Hooks catch problems before they reach the repo
    - Fix the root cause, then retry
    *WHY: Hooks are safety nets. Bypassing them defeats their purpose.*
+
+11. **Fix all test failures** - NEVER skip or ignore a failing test because it's "out of scope" or "pre-existing". Always fix it.
+   - If a test fails during your work, fix it before proceeding
+   - No test is someone else's problem
+   *WHY: Skipping failures erodes test trust. Every green run must mean everything works.*
 </critical-rules>
 
 <architecture>
