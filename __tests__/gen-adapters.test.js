@@ -277,6 +277,28 @@ describe('adapter-transforms', () => {
       expect(result).toContain('id');
     });
 
+    test('does not inject note when request_user_input has inline content', () => {
+      const input = '---\ndescription: x\n---\nrequest_user_input({ questions });\nrequest_user_input: { header: "test" }';
+      const result = transforms.transformForCodex(input, {
+        skillName: 'test',
+        description: 'test',
+        pluginInstallPath: '/tmp'
+      });
+      // Note only injected after standalone "request_user_input:" lines, not inline usage
+      expect(result).not.toContain('Codex');
+    });
+
+    test('removes multiSelect with tab indentation', () => {
+      const input = '---\ndescription: x\n---\n\tmultiSelect: true\n  multiSelect: false\nheader: "Test"';
+      const result = transforms.transformForCodex(input, {
+        skillName: 'test',
+        description: 'test',
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).not.toContain('multiSelect');
+      expect(result).toContain('header: "Test"');
+    });
+
     test('handles content with no AskUserQuestion', () => {
       const input = '---\ndescription: x\n---\nJust regular content here.';
       const result = transforms.transformForCodex(input, {
