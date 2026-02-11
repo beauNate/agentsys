@@ -19,5 +19,8 @@ module.exports = {
   // Clear mocks between tests
   clearMocks: true,
   // Restore mocks after each test
-  restoreMocks: true
+  restoreMocks: true,
+  // Run tests sequentially - parallel workers cause race conditions on shared
+  // filesystem state (discovery cache, adapter generation, preflight validators)
+  maxWorkers: 1
 };

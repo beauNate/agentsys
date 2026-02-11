@@ -5,6 +5,11 @@
  * Does NOT test actual npm execution (requires integration setup).
  */
 
+// Mock child_process before requiring the module under test
+jest.mock('child_process', () => ({
+  execFileSync: jest.fn()
+}));
+
 const { main } = require('../scripts/bump-version');
 
 // Mock console methods to suppress output during tests
@@ -14,6 +19,7 @@ let consoleErrorSpy;
 beforeEach(() => {
   consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
   consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+  require('child_process').execFileSync.mockClear();
 });
 
 afterEach(() => {
@@ -52,53 +58,27 @@ describe('bump-version', () => {
 
   describe('version validation', () => {
     test('accepts valid stable version format', () => {
-      // Mock execFileSync to prevent actual npm execution
-      const child_process = require('child_process');
-      const originalExecFileSync = child_process.execFileSync;
-      child_process.execFileSync = jest.fn();
-
       const code = main(['3.7.3']);
       expect(code).toBe(0);
       expect(consoleErrorSpy).not.toHaveBeenCalled();
-
-      // Restore
-      child_process.execFileSync = originalExecFileSync;
     });
 
     test('accepts valid prerelease version with rc', () => {
-      const child_process = require('child_process');
-      const originalExecFileSync = child_process.execFileSync;
-      child_process.execFileSync = jest.fn();
-
       const code = main(['3.7.3-rc.1']);
       expect(code).toBe(0);
       expect(consoleErrorSpy).not.toHaveBeenCalled();
-
-      child_process.execFileSync = originalExecFileSync;
     });
 
     test('accepts valid prerelease version with beta', () => {
-      const child_process = require('child_process');
-      const originalExecFileSync = child_process.execFileSync;
-      child_process.execFileSync = jest.fn();
-
       const code = main(['3.8.0-beta.1']);
       expect(code).toBe(0);
       expect(consoleErrorSpy).not.toHaveBeenCalled();
-
-      child_process.execFileSync = originalExecFileSync;
     });
 
     test('accepts valid prerelease version with alpha', () => {
-      const child_process = require('child_process');
-      const originalExecFileSync = child_process.execFileSync;
-      child_process.execFileSync = jest.fn();
-
       const code = main(['1.0.0-alpha.1']);
       expect(code).toBe(0);
       expect(consoleErrorSpy).not.toHaveBeenCalled();
-
-      child_process.execFileSync = originalExecFileSync;
     });
 
     test('rejects invalid version format - missing patch', () => {

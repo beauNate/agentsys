@@ -253,6 +253,12 @@ describe('dev-cli module', () => {
   });
 
   test('is executable', () => {
+    if (process.platform === 'win32') {
+      // Windows doesn't have Unix-style executable bits; verify shebang instead
+      const content = fs.readFileSync(cliPath, 'utf8');
+      expect(content).toMatch(/^#!/);
+      return;
+    }
     const stats = fs.statSync(cliPath);
     // Check owner execute bit
     expect(stats.mode & 0o100).toBeTruthy();

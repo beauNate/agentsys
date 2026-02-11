@@ -15,7 +15,7 @@ const AGENTS_MD = path.join(ROOT, 'AGENTS.md');
  */
 function runHook(jsonInput) {
   try {
-    const result = execFileSync(HOOK_SCRIPT, [], {
+    const result = execFileSync('bash', [HOOK_SCRIPT], {
       input: jsonInput,
       encoding: 'utf8',
       timeout: 5000,
@@ -25,6 +25,14 @@ function runHook(jsonInput) {
     // If the script exits non-zero, that is itself a test failure
     throw new Error(`Hook exited with code ${err.status}: ${err.stderr}`);
   }
+}
+
+// Skip hook execution tests on Windows if bash is unavailable
+let bashAvailable = true;
+try {
+  execFileSync('bash', ['--version'], { encoding: 'utf8', timeout: 3000 });
+} catch {
+  bashAvailable = false;
 }
 
 describe('script failure enforcement hooks', () => {
@@ -67,6 +75,12 @@ describe('script failure enforcement hooks', () => {
     });
 
     test('is executable', () => {
+      if (process.platform === 'win32') {
+        // Windows doesn't have Unix-style executable bits; verify shebang instead
+        const content = fs.readFileSync(HOOK_SCRIPT, 'utf8');
+        expect(content).toMatch(/^#!/);
+        return;
+      }
       const stats = fs.statSync(HOOK_SCRIPT);
       // Check user execute bit (0o100)
       expect(stats.mode & 0o111).toBeGreaterThan(0);
@@ -78,7 +92,7 @@ describe('script failure enforcement hooks', () => {
     });
   });
 
-  describe('pattern matching - project scripts should trigger reminder', () => {
+  (bashAvailable ? describe : describe.skip)('pattern matching - project scripts should trigger reminder', () => {
     const projectCommands = [
       'npm test',
       'npm test --coverage',
@@ -102,7 +116,7 @@ describe('script failure enforcement hooks', () => {
     });
   });
 
-  describe('pattern matching - non-project commands should be silent', () => {
+  (bashAvailable ? describe : describe.skip)('pattern matching - non-project commands should be silent', () => {
     const nonProjectCommands = [
       'git status',
       'ls -la',
@@ -120,7 +134,7 @@ describe('script failure enforcement hooks', () => {
     });
   });
 
-  describe('pattern matching - chained commands containing project scripts', () => {
+  (bashAvailable ? describe : describe.skip)('pattern matching - chained commands containing project scripts', () => {
     const chainedCommands = [
       'cd /some/dir && npm test',
       'cd /project && npm run validate',
@@ -134,7 +148,7 @@ describe('script failure enforcement hooks', () => {
     });
   });
 
-  describe('edge cases', () => {
+  (bashAvailable ? describe : describe.skip)('edge cases', () => {
     test('empty input exits 0 with no output', () => {
       const output = runHook('');
       expect(output).toBe('');
@@ -157,7 +171,7 @@ describe('script failure enforcement hooks', () => {
     });
   });
 
-  describe('hook always exits 0', () => {
+  (bashAvailable ? describe : describe.skip)('hook always exits 0', () => {
     test('exits 0 on project script', () => {
       // runHook throws if exit code != 0
       expect(() => runHook(JSON.stringify({ tool_input: { command: 'npm test' } }))).not.toThrow();

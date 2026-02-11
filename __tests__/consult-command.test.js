@@ -607,7 +607,7 @@ describe('cross-file consistency', () => {
 
   test('skill version matches plugin.json version', () => {
     const fm = parseFrontmatter(skillContent);
-    // Skill has version: 1.0.0, plugin.json may have -alpha suffix
-    expect(pluginJson.version).toMatch(new RegExp(`^${fm.version}`));
+    // Skill frontmatter version should match plugin.json version
+    expect(fm.version).toBe(pluginJson.version);
   });
 });
