@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.2.1] - 2026-02-11
+
+### Fixed
+- Removed unused `@awesome-slash/lib` publish job from release workflow
+- Cleaned up all references to lib as a standalone npm package (docs, scripts, tests, configs)
+
 ## [4.2.0] - 2026-02-11
 
 ### Added

@@ -2,7 +2,7 @@
 ---
 name: enhance-cross-file
 description: "Use when checking cross-file consistency: tools vs frontmatter, agent references, duplicate rules, contradictions."
-version: 4.2.0
+version: 4.2.1
 argument-hint: "[path]"
 ---
 
