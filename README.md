@@ -25,10 +25,10 @@
   <a href="#commands">Commands</a> · <a href="#installation">Installation</a> · <a href="https://avifenesh.github.io/awesome-slash/">Website</a> · <a href="https://github.com/avifenesh/awesome-slash/discussions">Discussions</a>
 </p>
 
+<p align="center"><em>New skills, agents, and tool integrations ship constantly. Follow for real-time updates:</em></p>
 <p align="center">
   <a href="https://x.com/avi_fenesh"><img src="https://img.shields.io/badge/Follow-@avi__fenesh-1DA1F2?style=for-the-badge&logo=x&logoColor=white" alt="Follow on X"></a>
 </p>
-<p align="center"><em>Claude Code, Codex CLI, and OpenCode ship updates constantly. Follow for real-time coverage as new features drop.</em></p>
 
 ---
 
