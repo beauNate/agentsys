@@ -128,6 +128,15 @@ function cleanAll() {
         removedCount++;
       }
     }
+    // Remove legacy agent files from pre-rename installs
+    const legacyAgentFiles = ['review.md', 'ship.md', 'workflow.md'];
+    for (const legacyFile of legacyAgentFiles) {
+      const legacyPath = path.join(opencodeAgentsDir, legacyFile);
+      if (fs.existsSync(legacyPath)) {
+        fs.unlinkSync(legacyPath);
+        removedCount++;
+      }
+    }
     if (removedCount > 0) {
       log(`  Removed ${removedCount} OpenCode agents`);
     }

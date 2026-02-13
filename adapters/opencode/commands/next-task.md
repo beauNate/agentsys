@@ -87,7 +87,7 @@ This workflow exists because each step serves a purpose. Taking shortcuts defeat
 9. Review Loop
 10. Delivery Validation
 11. Docs Update
-12. /ship
+12. `ship`
 
 **Human interaction points (ONLY THESE):**
 1. Policy selection via checkboxes
@@ -106,10 +106,10 @@ Each phase must complete before the next starts:
 | Review Loop | Must approve (no open issues or override) |
 | Delivery | Tests pass, build passes |
 | Docs | Documentation updated |
-| Ship | Explicit /ship invocation (not hook-only) |
+| Ship | Explicit `ship` invocation (plugin command) |
 
 **Forbidden actions for agents:**
-- No agent may create PRs or push to remote (only /ship)
+- No agent may create PRs or push to remote (only ship)
 - No agent may skip Phase 9, delivery-validator, or docs update
 </workflow-gates>
 
@@ -354,13 +354,13 @@ Uses the unified sync-docs agent from the sync-docs plugin with `before-pr` scop
 </phase-11>
 
 <phase-12>
-## Phase 12: Handoff to /ship
+## Phase 12: Handoff to ship
 
-After docs update (sync-docs-agent) completes, invoke /ship explicitly:
+After docs update (sync-docs-agent) completes, invoke `ship` explicitly:
 
 *(JavaScript reference - not executable in OpenCode)*
 
-**/ship responsibilities:**
+**ship responsibilities:**
 - Create PR, push branch
 - Monitor CI and review comments
 - Merge when approved
@@ -388,6 +388,6 @@ try {
 - Sonnet for validation tasks (review, delivery)
 - Haiku for simple tasks (worktree)
 - Fully autonomous after plan approval
-- Explicit /ship handoff for PR workflow
+- Explicit ship handoff for PR workflow
 
 Begin workflow now.

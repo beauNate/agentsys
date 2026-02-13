@@ -12,6 +12,9 @@
 
 const fs = require('fs');
 const path = require('path');
+const discovery = require('../lib/discovery');
+
+const ROOT_DIR = path.join(__dirname, '..');
 
 const home = process.env.HOME || process.env.USERPROFILE;
 
@@ -28,6 +31,10 @@ function getOpenCodeConfigDir() {
 }
 
 const OPENCODE_DIR = getOpenCodeConfigDir();
+
+const AGENT_FILES = new Set(discovery.discoverAgents(ROOT_DIR).map(agent => agent.file));
+const COMMAND_FILES = new Set(discovery.getCommandMappings(ROOT_DIR).map(([target]) => target));
+const SKILL_DIRS = new Set(discovery.discoverSkills(ROOT_DIR).map(skill => skill.dir));
 
 const issues = [];
 
@@ -87,7 +94,7 @@ const REQUIRED_PATTERNS = {
   ]
 };
 
-function validateDirectory(dir, type) {
+function validateDirectory(dir, type, allowlist) {
   if (!fs.existsSync(dir)) {
     console.log(`[SKIP] ${type} directory not found: ${dir}`);
     return;
@@ -99,10 +106,16 @@ function validateDirectory(dir, type) {
   for (const file of files) {
     let filePath;
     if (file.isDirectory()) {
+      if (allowlist && !allowlist.has(file.name)) {
+        continue;
+      }
       // For skills, check SKILL.md inside directory
       filePath = path.join(dir, file.name, 'SKILL.md');
       if (!fs.existsSync(filePath)) continue;
     } else if (file.name.endsWith('.md')) {
+      if (allowlist && !allowlist.has(file.name)) {
+        continue;
+      }
       filePath = path.join(dir, file.name);
     } else {
       continue;
@@ -137,9 +150,9 @@ function main() {
 
   // Validate each type
   // OpenCode expects commands directly in commands/, not a subdirectory
-  validateDirectory(path.join(OPENCODE_DIR, 'commands'), 'commands');
-  validateDirectory(path.join(OPENCODE_DIR, 'agents'), 'agents');
-  validateDirectory(path.join(OPENCODE_DIR, 'skills'), 'skills');
+  validateDirectory(path.join(OPENCODE_DIR, 'commands'), 'commands', COMMAND_FILES);
+  validateDirectory(path.join(OPENCODE_DIR, 'agents'), 'agents', AGENT_FILES);
+  validateDirectory(path.join(OPENCODE_DIR, 'skills'), 'skills', SKILL_DIRS);
 
   // Report results
   console.log('\n--- Results ---\n');

@@ -7,14 +7,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [5.0.1] - 2026-02-14
+
+### Fixed
+- **OpenCode legacy cleanup** - Installer now removes legacy agent files (`review.md`, `ship.md`, `workflow.md`) left over from pre-rename installs
+- **OpenCode install validator** - Now checks only the agents/commands/skills produced by discovery, preventing false positives from legacy files
+- **Windows compatibility** - `bump-version.js` uses `npm.cmd` on win32 (fixes `execFileSync` PATHEXT resolution)
+- **Windows test fixes** - Scaffold test tolerates `EBUSY` on temp directory cleanup; script-failure-hooks test skips bash-dependent tests on Windows
+- **Jest module resolution** - Added `moduleNameMapper` for `@agentsys/lib` to resolve to local `lib/` directory
+
+### Changed
+- **Workflow ship references** - Updated all `/ship` references to `ship:ship` (plugin-namespaced command) across next-task command, agents, hooks, and Codex/OpenCode adapters
+
 ## [4.1.1] - 2025-02-09
 
 ### Fixed
 - **Skills $ARGUMENTS parsing** - Added `$ARGUMENTS` parsing to 13 skills that declared `argument-hint` but never consumed the arguments (CC-SK-012)
 - **agnix config** - Migrated `.agnix.toml` `disabled_rules` from deprecated slug format to proper rule IDs (XP-003, AS-014)
 - **Memory file language** - Strengthened imperative language in AGENTS.md/CLAUDE.md (PE-003, CC-MEM-006)
-
-## [Unreleased]
 
 ## [4.2.2] - 2026-02-12
 

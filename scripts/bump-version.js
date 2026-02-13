@@ -63,7 +63,10 @@ Files updated (via npm version + stamp-version.js):
     // npm version updates package.json + package-lock.json, then triggers
     // the "version" lifecycle script which runs stamp-version.js.
     // Version is validated by VERSION_PATTERN above (safe for shell use).
-    execFileSync('npm', ['version', newVersion, '--no-git-tag-version'], {
+    // On Windows, execFileSync does not resolve npm.cmd via PATHEXT.
+    // Prefer the explicit .cmd suffix when running on win32.
+    const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+    execFileSync(npmCommand, ['version', newVersion, '--no-git-tag-version'], {
       cwd: path.join(__dirname, '..'),
       stdio: 'inherit'
     });

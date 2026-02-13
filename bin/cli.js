@@ -334,9 +334,11 @@ function installForOpenCode(installDir, options = {}) {
   // OpenCode global locations are under ~/.config/opencode (or $XDG_CONFIG_HOME/opencode).
   const commandsDir = path.join(opencodeConfigDir, 'commands');
   const pluginDir = path.join(opencodeConfigDir, 'plugins');
+  const agentsDir = path.join(opencodeConfigDir, 'agents');
 
   fs.mkdirSync(commandsDir, { recursive: true });
   fs.mkdirSync(pluginDir, { recursive: true });
+  fs.mkdirSync(agentsDir, { recursive: true });
 
   // Install native OpenCode plugin (auto-thinking, workflow enforcement, compaction)
   const pluginSrcDir = path.join(installDir, 'adapters', 'opencode-plugin');
@@ -390,10 +392,17 @@ function installForOpenCode(installDir, options = {}) {
     }
   }
 
+  // Remove legacy agent files from pre-rename installs.
+  const legacyAgentFiles = ['review.md', 'ship.md', 'workflow.md'];
+  for (const legacyFile of legacyAgentFiles) {
+    const legacyPath = path.join(agentsDir, legacyFile);
+    if (fs.existsSync(legacyPath)) {
+      fs.unlinkSync(legacyPath);
+    }
+  }
+
   // Install agents to global OpenCode location
   // OpenCode looks for agents in ~/.config/opencode/agents/ (global) or .opencode/agents/ (per-project)
-  const agentsDir = path.join(opencodeConfigDir, 'agents');
-  fs.mkdirSync(agentsDir, { recursive: true });
 
   console.log('  Installing agents for OpenCode...');
   const pluginDirs = discovery.discoverPlugins(installDir);

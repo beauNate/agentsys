@@ -15,6 +15,9 @@ const AGENTS_MD = path.join(ROOT, 'AGENTS.md');
  */
 function runHook(jsonInput) {
   try {
+    if (!bashAvailable) {
+      return '';
+    }
     const result = execFileSync('bash', [HOOK_SCRIPT], {
       input: jsonInput,
       encoding: 'utf8',
@@ -32,6 +35,10 @@ let bashAvailable = true;
 try {
   execFileSync('bash', ['--version'], { encoding: 'utf8', timeout: 3000 });
 } catch {
+  bashAvailable = false;
+}
+
+if (process.platform === 'win32') {
   bashAvailable = false;
 }
 

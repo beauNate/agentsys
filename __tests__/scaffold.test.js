@@ -52,7 +52,13 @@ beforeEach(() => {
 afterEach(() => {
   consoleLogSpy.mockRestore();
   consoleErrorSpy.mockRestore();
-  fs.rmSync(tmpDir, { recursive: true, force: true });
+  try {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  } catch (error) {
+    if (process.platform !== 'win32') {
+      throw error;
+    }
+  }
 });
 
 // ---------------------------------------------------------------------------

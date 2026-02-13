@@ -19,6 +19,10 @@ module.exports = {
     'lib/**/*.js',
     '!lib/**/*.test.js'
   ],
+  moduleNameMapper: {
+    '^@agentsys/lib$': '<rootDir>/lib/index.js',
+    '^@agentsys/lib/(.*)$': '<rootDir>/lib/$1'
+  },
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   verbose: true,

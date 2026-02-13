@@ -167,12 +167,12 @@ Report: branch name, worktree path, base commit. Confirm PWD anchored to worktre
 | Component | Creates | Cleans Up |
 |-----------|---------|-----------|
 | worktree-manager | worktrees, tasks.json entries, workflow-status.json | Nothing |
-| /ship | - | worktrees (after merge), tasks.json entries |
+| ship | - | worktrees (after merge), tasks.json entries |
 | --abort | - | worktrees, tasks.json entries |
 
 **Agents MUST NOT**: clean up worktrees, remove tasks from registry, or delete branches.
 
-## Cleanup Reference (for /ship and --abort)
+## Cleanup Reference (for ship and --abort)
 
 *(Bash command with Node.js require - adapt for OpenCode)*
 
@@ -192,7 +192,7 @@ On failure: remove partial worktree, prune refs, update state with `failPhase()`
 
 ## Constraints
 
-- Only create worktrees - never delete them (cleanup is handled by /ship or --abort)
+- Only create worktrees - never delete them (cleanup is handled by ship or --abort)
 - Do not remove tasks from tasks.json registry
 - Do not delete branches
 - Do not modify files in the main repository after switching to worktree

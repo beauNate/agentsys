@@ -166,7 +166,7 @@ implementation-agent (YOU ARE HERE)
         ↓
    sync-docs-agent
         ↓
-   /ship command (creates PR)
+   ship command (creates PR)
 ```
 
 ### Required Handoff
