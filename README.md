@@ -8,6 +8,8 @@
   <strong>A modular runtime and orchestration system for AI agents.</strong>
 </p>
 
+> **Renamed from `awesome-slash`** — The `awesome-` prefix implies a curated list of links, but this project is a functional software suite and runtime. Please update your installs: `npm install -g agentsys`
+
 <p align="center">
   <a href="https://www.npmjs.com/package/agentsys"><img src="https://img.shields.io/npm/v/agentsys.svg" alt="npm version"></a>
   <a href="https://www.npmjs.com/package/agentsys"><img src="https://img.shields.io/npm/dm/agentsys.svg" alt="npm downloads"></a>
