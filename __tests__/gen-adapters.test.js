@@ -337,11 +337,14 @@ describe('gen-adapters', () => {
       expect(codexPaths.length).toBeGreaterThan(0);
     });
 
-    test('generates files with auto-generated header', () => {
+    test('generated files start with frontmatter (no header before ---)', () => {
       const { files } = genAdapters.computeAdapters();
-      for (const [, content] of files) {
-        expect(content).toContain('AUTO-GENERATED');
-        expect(content).toContain('DO NOT EDIT');
+      for (const [filePath, content] of files) {
+        if (content.includes('---\n')) {
+          // Files with frontmatter must start with --- on line 1
+          // (no auto-generated header before frontmatter)
+          expect(content.startsWith('---\n')).toBe(true);
+        }
       }
     });
 
@@ -354,8 +357,7 @@ describe('gen-adapters', () => {
         const content = files.get(cmdPath);
         if (content.includes('---\n')) {
           // Files with frontmatter should have the OpenCode format
-          const afterHeader = content.replace(/^<!-- AUTO-GENERATED[^\n]*\n/, '');
-          if (afterHeader.startsWith('---\n')) {
+          if (content.startsWith('---\n')) {
             expect(content).toContain('agent: general');
             expect(content).not.toContain('argument-hint');
             expect(content).not.toContain('codex-description');
