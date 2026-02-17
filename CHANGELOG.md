@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.0] - 2026-02-18
+
+### Added
+
+- **`/debate` plugin** — New plugin for structured multi-round AI dialectic. Pick two tools (e.g. `codex vs gemini`), set 1–5 rounds, and get a proposer/challenger debate with a synthesized verdict. Supports natural language input, effort levels (`--effort=low|high|max`), and context injection (`--context=diff` or `--context=file=PATH`). Available on Claude Code, OpenCode, and Codex CLI.
+- **`/consult` multi-instance support** — Run N parallel consultations with the same tool using `--count=N` (or natural language: "ask 3 gemini about this"). Responses are numbered and a brief synthesis highlights agreements and differences.
+- **`/consult` natural language parsing** — Free-form queries are now parsed automatically without requiring explicit flags. "with codex about my auth approach", "ask gemini thoroughly about this design", or "3 claude opinions on error handling" all work out of the box.
+
+### Changed
+
+- **Agent model optimization** — `exploration-agent` and `learn-agent` switched from opus to sonnet, reducing cost and latency for exploration and research passes with no quality regression.
+
+### Fixed
+
+- **Debate `--context=file` path validation** — Added path containment checks to prevent directory traversal when passing file paths as context.
+- **Debate prompt hardening** — Context passthrough, canonical output redaction, and relaxed disagreement rules applied consistently across all debate rounds.
+- **Consult model/flag issues** — Hardened model flag handling and non-interactive invocation across all four supported tools (Claude, Gemini, Codex, OpenCode).
+
 ## [5.0.3] - 2026-02-17
 
 ### Fixed

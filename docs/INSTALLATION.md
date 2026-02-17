@@ -33,6 +33,8 @@ Add the marketplace and install plugins directly in Claude Code:
 /plugin install perf@agentsys
 /plugin install sync-docs@agentsys
 /plugin install learn@agentsys
+/plugin install consult@agentsys
+/plugin install debate@agentsys
 ```
 
 **Scopes** (optional):
@@ -186,6 +188,8 @@ You should see commands:
 - `/perf` - Performance investigation workflow
 - `/sync-docs` - Documentation sync
 - `/learn` - Topic research and learning guides
+- `/consult` - Cross-tool AI consultation
+- `/debate` - Structured AI dialectic with verdict
 
 ### OpenCode / Codex
 
