@@ -670,6 +670,48 @@ agent-knowledge/
 
 ---
 
+### /debate
+
+**Purpose:** Stress-test ideas through structured multi-round debate between two AI CLI tools.
+
+**What it does:**
+
+1. **Tool Detection** - Detects which AI CLI tools are installed (cross-platform)
+2. **Interactive Picker** - If no tools specified, prompts for proposer, challenger, effort, rounds, and context in a single batch question
+3. **Proposer/Challenger Format** - First tool argues for the topic; second tool challenges with evidence
+4. **Multi-Round Exchange** - Each round the proposer defends and the challenger responds (1–5 rounds)
+5. **Verdict** - Orchestrator delivers a final synthesis picking a winner with reasoning
+
+**Usage:**
+
+```bash
+# Natural language
+/debate codex vs gemini about microservices vs monolith
+/debate with claude and codex about our auth implementation
+/debate thoroughly gemini vs codex about database schema design
+/debate codex vs gemini 3 rounds about event sourcing
+
+# Explicit flags
+/debate "Should we use event sourcing?" --tools=claude,gemini --rounds=3 --effort=high
+/debate "Redis vs PostgreSQL for caching" --tools=codex,opencode
+
+# With codebase context
+/debate "Is our current approach correct?" --tools=gemini,codex --context=diff
+```
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--tools=TOOL1,TOOL2` | Proposer and challenger (comma-separated) |
+| `--rounds=N` | Number of debate rounds, 1–5 (default: 2) |
+| `--effort=low\|medium\|high\|max` | Reasoning depth per tool call |
+| `--context=diff\|file=PATH\|none` | Codebase context passed to both tools |
+
+**Agent:** debate-orchestrator (opus model for orchestration)
+
+---
+
 ## How Commands Work Together
 
 **Standalone use:**
