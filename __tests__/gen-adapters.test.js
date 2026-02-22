@@ -321,6 +321,302 @@ describe('adapter-transforms', () => {
       expect(result).toContain('Just regular content here.');
     });
   });
+
+  describe('transformRuleForCursor', () => {
+    test('generates MDC frontmatter with description, globs, and alwaysApply', () => {
+      const input = '---\ndescription: original\n---\nbody content';
+      const result = transforms.transformRuleForCursor(input, {
+        description: 'A test rule',
+        pluginInstallPath: '/usr/local/plugins/test',
+        globs: '*.js',
+        alwaysApply: true
+      });
+      expect(result).toContain('description: "A test rule"');
+      expect(result).toContain('globs: "*.js"');
+      expect(result).toContain('alwaysApply: true');
+      expect(result).toContain('body content');
+      expect(result).not.toContain('description: original');
+    });
+
+    test('omits globs when empty', () => {
+      const input = 'no frontmatter content';
+      const result = transforms.transformRuleForCursor(input, {
+        description: 'test',
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).not.toContain('globs:');
+      expect(result).toContain('alwaysApply: true');
+    });
+
+    test('escapes quotes in description', () => {
+      const input = '---\ndescription: x\n---\nbody';
+      const result = transforms.transformRuleForCursor(input, {
+        description: 'Use when user says "hello"',
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).toContain('description: "Use when user says \\"hello\\""');
+    });
+
+    test('replaces PLUGIN_ROOT with install path', () => {
+      const input = 'Path: ${CLAUDE_PLUGIN_ROOT}/lib and $PLUGIN_ROOT/scripts';
+      const result = transforms.transformRuleForCursor(input, {
+        description: 'test',
+        pluginInstallPath: '/home/user/.agentsys/plugins/test'
+      });
+      expect(result).toContain('/home/user/.agentsys/plugins/test/lib');
+      expect(result).toContain('/home/user/.agentsys/plugins/test/scripts');
+      expect(result).not.toContain('PLUGIN_ROOT');
+      expect(result).not.toContain('CLAUDE_PLUGIN_ROOT');
+    });
+
+    test('strips require() statements', () => {
+      const input = 'const foo = require("./bar");\nconst { x } = require("y");\nkeep this';
+      const result = transforms.transformRuleForCursor(input, {
+        description: 'test',
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).not.toContain('require(');
+      expect(result).toContain('keep this');
+    });
+
+    test('strips plugin namespacing', () => {
+      const input = 'invoke next-task:exploration-agent and deslop:deslop-agent';
+      const result = transforms.transformRuleForCursor(input, {
+        description: 'test',
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).toContain('exploration-agent');
+      expect(result).toContain('deslop-agent');
+      expect(result).not.toContain('next-task:');
+      expect(result).not.toContain('deslop:');
+    });
+
+    test('strips Task() calls and replaces with plain text', () => {
+      const input = 'await Task({ subagent_type: "next-task:exploration-agent" });';
+      const result = transforms.transformRuleForCursor(input, {
+        description: 'test',
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).toContain('Invoke the exploration-agent agent');
+      expect(result).not.toContain('Task(');
+    });
+
+    test('adds frontmatter to content without existing frontmatter', () => {
+      const input = '# No frontmatter\nBody content';
+      const result = transforms.transformRuleForCursor(input, {
+        description: 'test desc',
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).toMatch(/^---\n/);
+      expect(result).toContain('description: "test desc"');
+      expect(result).toContain('# No frontmatter');
+    });
+
+    test('sets alwaysApply false when provided', () => {
+      const input = 'body content';
+      const result = transforms.transformRuleForCursor(input, {
+        description: 'test',
+        pluginInstallPath: '/tmp',
+        globs: '*.ts',
+        alwaysApply: false
+      });
+      expect(result).toContain('alwaysApply: false');
+    });
+
+    test('escapes backslash in description', () => {
+      const input = 'body';
+      const result = transforms.transformRuleForCursor(input, {
+        description: 'path\\to\\file',
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).toContain('description: "path\\\\to\\\\file"');
+    });
+
+    test('strips control characters from description', () => {
+      const input = 'body';
+      const result = transforms.transformRuleForCursor(input, {
+        description: 'line1\x00line2\x0aline3',
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).not.toMatch(/[\x00-\x09\x0b-\x1f\x7f]/);
+    });
+
+    test('quotes globs value with JSON.stringify', () => {
+      const input = 'body';
+      const result = transforms.transformRuleForCursor(input, {
+        description: 'test',
+        pluginInstallPath: '/tmp',
+        globs: '*.{ts,tsx}'
+      });
+      expect(result).toContain('globs: "*.{ts,tsx}"');
+    });
+
+    test('handles frontmatter without trailing newline', () => {
+      const input = '---\ndescription: old\n---body after';
+      const result = transforms.transformRuleForCursor(input, {
+        description: 'new',
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).toContain('description: "new"');
+      expect(result).toContain('body after');
+      expect(result).not.toContain('description: old');
+    });
+
+    test('transformForCursor is an alias for transformRuleForCursor', () => {
+      expect(transforms.transformForCursor).toBe(transforms.transformRuleForCursor);
+    });
+  });
+
+  describe('transformSkillForCursor', () => {
+    test('replaces PLUGIN_ROOT paths with install path', () => {
+      const input = '---\nname: test\n---\nPath: ${CLAUDE_PLUGIN_ROOT}/lib and $PLUGIN_ROOT/scripts';
+      const result = transforms.transformSkillForCursor(input, {
+        pluginInstallPath: '/home/user/.agentsys/plugins/test'
+      });
+      expect(result).toContain('/home/user/.agentsys/plugins/test/lib');
+      expect(result).toContain('/home/user/.agentsys/plugins/test/scripts');
+    });
+
+    test('strips plugin namespace prefixes', () => {
+      const input = 'invoke next-task:exploration-agent and deslop:deslop-agent';
+      const result = transforms.transformSkillForCursor(input, {
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).toContain('exploration-agent');
+      expect(result).not.toContain('next-task:');
+    });
+
+    test('preserves frontmatter (not stripped)', () => {
+      const input = '---\nname: my-skill\ndescription: A cool skill\n---\nBody content';
+      const result = transforms.transformSkillForCursor(input, {
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).toContain('---\nname: my-skill\ndescription: A cool skill\n---');
+      expect(result).toContain('Body content');
+    });
+  });
+
+  describe('transformCommandForCursor', () => {
+    test('strips frontmatter', () => {
+      const input = '---\ndescription: original\nargument-hint: "[path]"\n---\nBody content';
+      const result = transforms.transformCommandForCursor(input, {
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).not.toContain('description: original');
+      expect(result).not.toContain('argument-hint');
+      expect(result).toContain('Body content');
+    });
+
+    test('replaces PLUGIN_ROOT paths', () => {
+      const input = 'Path: ${CLAUDE_PLUGIN_ROOT}/lib and $PLUGIN_ROOT/scripts';
+      const result = transforms.transformCommandForCursor(input, {
+        pluginInstallPath: '/home/user/.agentsys/plugins/test'
+      });
+      expect(result).toContain('/home/user/.agentsys/plugins/test/lib');
+      expect(result).toContain('/home/user/.agentsys/plugins/test/scripts');
+    });
+
+    test('strips require() statements', () => {
+      const input = 'const foo = require("./bar");\nkeep this';
+      const result = transforms.transformCommandForCursor(input, {
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).not.toContain('require(');
+      expect(result).toContain('keep this');
+    });
+
+    test('strips Task() calls and replaces with plain text', () => {
+      const input = 'await Task({ subagent_type: "next-task:exploration-agent" });';
+      const result = transforms.transformCommandForCursor(input, {
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).toContain('Invoke the exploration-agent agent');
+      expect(result).not.toContain('Task(');
+    });
+
+    test('strips plugin namespace prefixes', () => {
+      const input = 'invoke next-task:exploration-agent and deslop:deslop-agent';
+      const result = transforms.transformCommandForCursor(input, {
+        pluginInstallPath: '/tmp'
+      });
+      expect(result).toContain('exploration-agent');
+      expect(result).not.toContain('next-task:');
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Unit tests for getCursorRuleMappings
+// ---------------------------------------------------------------------------
+
+describe('getCursorRuleMappings', () => {
+  const os = require('os');
+  const tmpDir = path.join(os.tmpdir(), 'cursor-rule-test-' + Date.now());
+  const pluginName = 'test-plugin';
+
+  function setupPlugin(commands) {
+    // Create plugin structure
+    const pluginDir = path.join(tmpDir, 'plugins', pluginName);
+    const pluginJsonDir = path.join(pluginDir, '.claude-plugin');
+    const commandsDir = path.join(pluginDir, 'commands');
+    fs.mkdirSync(pluginJsonDir, { recursive: true });
+    fs.mkdirSync(commandsDir, { recursive: true });
+    fs.writeFileSync(path.join(pluginJsonDir, 'plugin.json'), '{}');
+    for (const [filename, content] of Object.entries(commands)) {
+      fs.writeFileSync(path.join(commandsDir, filename), content);
+    }
+  }
+
+  afterAll(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  test('uses cursor-description over codex-description over description', () => {
+    setupPlugin({
+      'all-three.md': '---\ndescription: generic\ncodex-description: codex\ncursor-description: cursor\n---\nbody',
+      'codex-and-desc.md': '---\ndescription: generic\ncodex-description: codex\n---\nbody',
+      'desc-only.md': '---\ndescription: generic\n---\nbody'
+    });
+    discovery.invalidateCache();
+    const mappings = discovery.getCursorRuleMappings(tmpDir);
+
+    const byName = {};
+    for (const m of mappings) byName[m[0]] = m;
+
+    expect(byName[`agentsys-${pluginName}-all-three`][3]).toBe('cursor');
+    expect(byName[`agentsys-${pluginName}-codex-and-desc`][3]).toBe('codex');
+    expect(byName[`agentsys-${pluginName}-desc-only`][3]).toBe('generic');
+  });
+
+  test('extracts globs from frontmatter', () => {
+    setupPlugin({
+      'with-globs.md': '---\ndescription: test\nglobs: "*.ts"\n---\nbody'
+    });
+    discovery.invalidateCache();
+    const mappings = discovery.getCursorRuleMappings(tmpDir);
+    const match = mappings.find(m => m[0] === `agentsys-${pluginName}-with-globs`);
+    expect(match[5]).toBe('*.ts');
+  });
+
+  test('names rules as agentsys-<plugin>-<name>', () => {
+    setupPlugin({
+      'my-command.md': '---\ndescription: test\n---\nbody'
+    });
+    discovery.invalidateCache();
+    const mappings = discovery.getCursorRuleMappings(tmpDir);
+    const names = mappings.map(m => m[0]);
+    expect(names).toContain('agentsys-test-plugin-my-command');
+  });
+
+  test('returns empty description for commands without any description field', () => {
+    setupPlugin({
+      'no-desc.md': '---\ntype: command\n---\nbody'
+    });
+    discovery.invalidateCache();
+    const mappings = discovery.getCursorRuleMappings(tmpDir);
+    const match = mappings.find(m => m[0] === `agentsys-${pluginName}-no-desc`);
+    expect(match[3]).toBe('');
+  });
 });
 
 // ---------------------------------------------------------------------------

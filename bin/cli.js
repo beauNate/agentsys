@@ -22,7 +22,7 @@ const discovery = require('../lib/discovery');
 const transforms = require('../lib/adapter-transforms');
 
 // Valid tool names
-const VALID_TOOLS = ['claude', 'opencode', 'codex'];
+const VALID_TOOLS = ['claude', 'opencode', 'codex', 'cursor'];
 
 function getInstallDir() {
   const home = process.env.HOME || process.env.USERPROFILE;
@@ -847,6 +847,9 @@ function detectInstalledPlatforms() {
   const opencodeDir = getOpenCodeConfigDir();
   if (fs.existsSync(opencodeDir)) platforms.push('opencode');
   if (fs.existsSync(path.join(home, '.codex'))) platforms.push('codex');
+  // Cursor rules are project-scoped; detect only if Cursor rules/commands/skills exist in CWD
+  const cursorDir = path.join(process.cwd(), '.cursor');
+  if (fs.existsSync(path.join(cursorDir, 'rules')) || fs.existsSync(path.join(cursorDir, 'commands')) || fs.existsSync(path.join(cursorDir, 'skills'))) platforms.push('cursor');
   return platforms;
 }
 
@@ -939,7 +942,7 @@ async function installPlugin(nameWithVersion, args) {
 
   // Use cache as install source
   const installDir = getInstallDir();
-  const needsLocal = platforms.includes('opencode') || platforms.includes('codex');
+  const needsLocal = platforms.includes('opencode') || platforms.includes('codex') || platforms.includes('cursor');
   if (needsLocal && !fs.existsSync(path.join(installDir, 'lib'))) {
     // Need local install for transforms
     cleanOldInstallation(installDir);
@@ -972,6 +975,9 @@ async function installPlugin(nameWithVersion, args) {
   }
   if (platforms.includes('codex') && installDir) {
     installForCodex(installDir, { filter });
+  }
+  if (platforms.includes('cursor') && installDir) {
+    installForCursor(installDir, { filter });
   }
 
   // Record in installed.json
@@ -1489,6 +1495,101 @@ function installForCodex(installDir, options = {}) {
   return true;
 }
 
+function installForCursor(installDir, options = {}) {
+  console.log('\n[INSTALL] Installing for Cursor...\n');
+  const { filter = null } = options;
+  const cwd = process.cwd();
+
+  // Create target directories (all project-scoped)
+  const skillsDir = path.join(cwd, '.cursor', 'skills');
+  const commandsDir = path.join(cwd, '.cursor', 'commands');
+  const rulesDir = path.join(cwd, '.cursor', 'rules');
+  fs.mkdirSync(skillsDir, { recursive: true });
+  fs.mkdirSync(commandsDir, { recursive: true });
+  fs.mkdirSync(rulesDir, { recursive: true });
+
+  // Cleanup old agentsys files from rules dir
+  for (const f of fs.readdirSync(rulesDir).filter(f => f.startsWith('agentsys-') && f.endsWith('.mdc'))) {
+    fs.unlinkSync(path.join(rulesDir, f));
+  }
+
+  // Cleanup old agentsys files from commands dir (only those matching known commands)
+  const commandMappingsForCleanup = discovery.getCommandMappings(installDir);
+  const knownCommandFiles = new Set(commandMappingsForCleanup.map(([target]) => target));
+  for (const f of fs.readdirSync(commandsDir).filter(f => f.endsWith('.md'))) {
+    if (knownCommandFiles.has(f)) {
+      fs.unlinkSync(path.join(commandsDir, f));
+    }
+  }
+
+  // Collect known skill names from discovery before cleanup
+  const pluginDirs = discovery.discoverPlugins(installDir);
+  const knownSkillNames = new Set();
+  for (const pluginName of pluginDirs) {
+    const srcSkillsDir = path.join(installDir, 'plugins', pluginName, 'skills');
+    if (!fs.existsSync(srcSkillsDir)) continue;
+    for (const d of fs.readdirSync(srcSkillsDir, { withFileTypes: true })) {
+      if (d.isDirectory() && /^[a-zA-Z0-9_-]+$/.test(d.name)) knownSkillNames.add(d.name);
+    }
+  }
+
+  // Cleanup old agentsys skill dirs (only known names, preserve user-created skills)
+  for (const entry of fs.readdirSync(skillsDir, { withFileTypes: true })) {
+    if (entry.isDirectory() && knownSkillNames.has(entry.name)) {
+      fs.rmSync(path.join(skillsDir, entry.name), { recursive: true, force: true });
+    }
+  }
+
+  // Install skills
+  let skillCount = 0;
+  for (const pluginName of pluginDirs) {
+    const srcSkillsDir = path.join(installDir, 'plugins', pluginName, 'skills');
+    if (!fs.existsSync(srcSkillsDir)) continue;
+    const entries = fs.readdirSync(srcSkillsDir, { withFileTypes: true }).filter(d => d.isDirectory());
+    for (const entry of entries) {
+      if (!/^[a-zA-Z0-9_-]+$/.test(entry.name)) continue;
+      if (filter && filter.skills && filter.skills.length > 0 && !filter.skills.includes(entry.name)) continue;
+      const srcPath = path.join(srcSkillsDir, entry.name, 'SKILL.md');
+      if (!fs.existsSync(srcPath)) continue;
+      const destDir = path.join(skillsDir, entry.name);
+      fs.mkdirSync(destDir, { recursive: true });
+      let content = fs.readFileSync(srcPath, 'utf8');
+      content = transforms.transformSkillForCursor(content, {
+        pluginInstallPath: path.join(installDir, 'plugins', pluginName)
+      });
+      fs.writeFileSync(path.join(destDir, 'SKILL.md'), content);
+      skillCount++;
+    }
+  }
+
+  // Install commands
+  const commandMappings = discovery.getCommandMappings(installDir);
+  let cmdCount = 0;
+  for (const [target, plugin, source] of commandMappings) {
+    if (filter && filter.commands && filter.commands.length > 0) {
+      const cmdName = target.replace(/\.md$/, '');
+      if (!filter.commands.includes(cmdName)) continue;
+    }
+    const srcPath = path.join(installDir, 'plugins', plugin, 'commands', source);
+    if (!fs.existsSync(srcPath)) {
+      console.log(`  [WARN] Source file not found: ${srcPath}`);
+      continue;
+    }
+    let content = fs.readFileSync(srcPath, 'utf8');
+    content = transforms.transformCommandForCursor(content, {
+      pluginInstallPath: path.join(installDir, 'plugins', plugin)
+    });
+    fs.writeFileSync(path.join(commandsDir, target), content);
+    cmdCount++;
+  }
+
+  console.log(`\n[OK] Cursor installation complete!`);
+  console.log(`   Skills: ${skillCount} installed to ${skillsDir}`);
+  console.log(`   Commands: ${cmdCount} installed to ${commandsDir}`);
+  console.log('   All content is project-scoped and auto-loaded by Cursor.\n');
+  return true;
+}
+
 function removeInstallation() {
   const installDir = getInstallDir();
 
@@ -1505,6 +1606,7 @@ function removeInstallation() {
   console.log('  - Claude: /plugin marketplace remove agentsys');
   console.log('  - OpenCode: Remove files under ~/.config/opencode/ (commands/*.md, agents/*.md, skills/*/SKILL.md) and ~/.config/opencode/plugins/agentsys.ts');
   console.log('  - Codex: Remove ~/.codex/skills/*/');
+  console.log('  - Cursor: Remove .cursor/skills/, .cursor/commands/, and .cursor/rules/agentsys-*.mdc from your project');
 }
 
 function printSubcommandHelp(subcommand) {
@@ -1525,7 +1627,7 @@ Examples:
   agentsys install perf@1.2.0            Install perf at version 1.2.0
 
 Options:
-  --tool <name>     Install for a specific platform (claude, opencode, codex)
+  --tool <name>     Install for a specific platform (claude, opencode, codex, cursor)
   --tools <list>    Install for multiple platforms (comma-separated)
 
 Notes:
@@ -1619,7 +1721,7 @@ agentsys v${VERSION} - Workflow automation for AI coding assistants
 
 Usage:
   agentsys                    Interactive installer (select platforms)
-  agentsys --tool <name>      Install for single tool (claude, opencode, codex)
+  agentsys --tool <name>      Install for single tool (claude, opencode, codex, cursor)
   agentsys --tools <list>     Install for multiple tools (comma-separated)
   agentsys --only <plugins>   Install only specified plugins (comma-separated, resolves deps)
   agentsys --development      Development mode: install to ~/.claude/plugins
@@ -1646,7 +1748,7 @@ Non-Interactive Examples:
   agentsys --tool claude              # Install for Claude Code only
   agentsys --tool opencode            # Install for OpenCode only
   agentsys --tools "claude,opencode"  # Install for both
-  agentsys --tools claude,opencode,codex  # Install for all three
+  agentsys --tools claude,opencode,codex,cursor  # Install for all
   agentsys --only next-task           # Install next-task + its dependencies
   agentsys --only "next-task,perf"    # Install specific plugins + deps
 
@@ -1666,6 +1768,7 @@ Supported Platforms:
   claude   - Claude Code (marketplace install or development mode)
   opencode - OpenCode (local commands + native plugin)
   codex    - Codex CLI (local skills)
+  cursor   - Cursor (project-scoped .mdc rules)
 
 Install:  npm install -g agentsys && agentsys
 Update:   npm update -g agentsys && agentsys
@@ -1770,7 +1873,8 @@ async function main() {
     const options = [
       { value: 'claude', label: 'Claude Code' },
       { value: 'opencode', label: 'OpenCode' },
-      { value: 'codex', label: 'Codex CLI' }
+      { value: 'codex', label: 'Codex CLI' },
+      { value: 'cursor', label: 'Cursor' }
     ];
 
     selected = await multiSelect(
@@ -1801,8 +1905,8 @@ async function main() {
 
   await fetchExternalPlugins(pluginNames, marketplace);
 
-  // Only copy to ~/.agentsys if OpenCode or Codex selected (they need local files)
-  const needsLocalInstall = selected.includes('opencode') || selected.includes('codex');
+  // Only copy to ~/.agentsys if OpenCode, Codex, or Cursor selected (they need local files)
+  const needsLocalInstall = selected.includes('opencode') || selected.includes('codex') || selected.includes('cursor');
   let installDir = null;
 
   if (needsLocalInstall) {
@@ -1833,6 +1937,11 @@ async function main() {
       case 'codex':
         if (!installForCodex(installDir)) {
           failedPlatforms.push('codex');
+        }
+        break;
+      case 'cursor':
+        if (!installForCursor(installDir)) {
+          failedPlatforms.push('cursor');
         }
         break;
     }
@@ -1885,5 +1994,6 @@ module.exports = {
   parseInstallTarget,
   loadComponents,
   resolveComponent,
-  buildFilterFromComponent
+  buildFilterFromComponent,
+  installForCursor
 };
