@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.3.4] - 2026-03-02
+
+### Fixed
+
+- **Kiro installs globally to ~/.kiro/** - Previously installed to `cwd/.kiro/` (project-scoped) which only worked in the agentsys directory. Now installs to `~/.kiro/` like other platforms (OpenCode → `~/.config/opencode/`, Codex → `~/.codex/`). Detection checks both global and project paths.
+
 ## [5.3.3] - 2026-03-02
 
 ### Fixed

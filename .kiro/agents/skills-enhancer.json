@@ -6,6 +6,6 @@
     "read"
   ],
   "resources": [
-    ".kiro/steering/**/*.md"
+    "file://.kiro/steering/**/*.md"
   ]
 }
