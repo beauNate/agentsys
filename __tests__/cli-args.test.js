@@ -569,7 +569,7 @@ describe('installForKiro', () => {
     expect(parsed.description).toBe('A test agent');
     expect(parsed.prompt).toContain('Agent instructions here');
     expect(parsed.tools).toEqual(expect.arrayContaining(['read', 'write', 'shell']));
-    expect(parsed.resources).toEqual(['file://.kiro/steering/**/*.md']);
+    expect(parsed.resources).toEqual(['.kiro/steering/**/*.md']);
   });
 
   test('cleans up old steering files on reinstall', () => {

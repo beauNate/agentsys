@@ -698,7 +698,7 @@ describe('Kiro transforms', () => {
       const input = '---\nname: test\n---\nPrompt';
       const result = transforms.transformAgentForKiro(input);
       const parsed = JSON.parse(result);
-      expect(parsed.resources).toEqual(['file://.kiro/steering/**/*.md']);
+      expect(parsed.resources).toEqual(['.kiro/steering/**/*.md']);
     });
 
     test('replaces PLUGIN_ROOT in body', () => {
@@ -743,7 +743,7 @@ describe('Kiro transforms', () => {
       expect(parsed.prompt).toContain('Error handling, naming');
       expect(parsed.prompt).toContain('Injection, auth');
       expect(parsed.tools).toEqual(['read']);
-      expect(parsed.resources).toEqual(['file://.kiro/steering/**/*.md']);
+      expect(parsed.resources).toEqual(['.kiro/steering/**/*.md']);
     });
 
     test('includes JSON output instruction', () => {

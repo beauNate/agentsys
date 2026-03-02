@@ -949,9 +949,9 @@ function detectInstalledPlatforms() {
   // Cursor rules are project-scoped; detect only if Cursor rules/commands/skills exist in CWD
   const cursorDir = path.join(process.cwd(), '.cursor');
   if (fs.existsSync(path.join(cursorDir, 'rules')) || fs.existsSync(path.join(cursorDir, 'commands')) || fs.existsSync(path.join(cursorDir, 'skills'))) platforms.push('cursor');
-  // Kiro is project-scoped; detect if .kiro/ directory exists in CWD
+  // Kiro is project-scoped; detect .kiro/ directory in CWD (any content, including fresh workspaces)
   const kiroDir = path.join(process.cwd(), '.kiro');
-  if (fs.existsSync(path.join(kiroDir, 'steering')) || fs.existsSync(path.join(kiroDir, 'skills')) || fs.existsSync(path.join(kiroDir, 'agents'))) platforms.push('kiro');
+  if (fs.existsSync(kiroDir)) platforms.push('kiro');
   return platforms;
 }
 
