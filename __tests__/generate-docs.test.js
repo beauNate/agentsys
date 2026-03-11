@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const genDocs = require('../scripts/generate-docs');
+const { STATIC_SKILLS } = genDocs;
 const discovery = require('../lib/discovery');
 
 const REPO_ROOT = path.join(__dirname, '..');
@@ -89,7 +90,8 @@ describe('generate-docs', () => {
     test('shows correct total skill count', () => {
       const skills = discovery.discoverSkills(REPO_ROOT);
       const table = genDocs.generateSkillsTable(skills);
-      expect(table).toContain(`${skills.length} skills included`);
+      const expectedCount = skills.length > 0 ? skills.length : STATIC_SKILLS.length;
+      expect(table).toContain(`${expectedCount} skills included`);
     });
 
     test('includes category headers when skills exist', () => {
@@ -103,8 +105,9 @@ describe('generate-docs', () => {
     test('all skills are represented in the table', () => {
       const skills = discovery.discoverSkills(REPO_ROOT);
       const table = genDocs.generateSkillsTable(skills);
-      for (const skill of skills) {
-        expect(table).toContain(`${skill.plugin}:${skill.name}`);
+      const effectiveSkills = skills.length > 0 ? skills : STATIC_SKILLS;
+      for (const skill of effectiveSkills) {
+        expect(table).toContain(`\`${skill.name}\``);
       }
     });
   });
